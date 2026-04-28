@@ -18,9 +18,16 @@ Most teams use GitHub Issues as a dumb backlog. `gh-pms` adds the structure that
 
 Everything lives natively in GitHub. Open the Issues, Milestones, or Projects tab and you see exactly where the project is.
 
-## What's new in v0.2
+## What's new in v0.3
 
-GitHub-native primitives replace label-only tracking:
+The "every feature must end with a linked PR" rule is now baked into the lifecycle:
+
+- **`gh-push` skill** ✨ — One command to commit, push, open PR with `Closes #N`, post Gate 4 self-review evidence, ask the user to approve, and `gh pr merge`. Mirrors the popular `/push` pattern but PR-aware and lifecycle-integrated. Supports `--message`, `--no-merge`, `--admin`, `--squash` / `--merge` / `--rebase`, `--dry`, `--force`.
+- **Branching policy** — `workflows/default.yaml#branching` defines `protected_base` (default: `main` / `master`), `pr_required_kinds` (feature / bug / hotfix / chore / testcase), `branch_template` (default: `{kind_short}/{number}-{slug}`), and `pr_must_close_issue: true`. The rule is enforced in three places: `gh-current` auto-creates the branch on start, `gh-advance` Gate 1 refuses if HEAD is on the protected base, and `gh-push` refuses to ship from the protected base.
+- **`gh-current`** now records `branch` + `base` in the per-issue state file so `gh-push` finds them later. The "🚧 Work started" comment mentions the branch name.
+- **`gh-advance`** Gate 1 has a clear rescue-recipe error if work is on the wrong branch. One-off legacy state can opt out with the `[gh-pms: branch-exception]` marker in the issue body.
+
+### From v0.2: GitHub-native primitives
 
 - **Issue Types** (orgs only): `Feature`, `Bug`, `Task` set via GraphQL, not labels — when the org has them enabled
 - **Projects v2** integration: `gh-init --with-project` provisions a `gh-pms` board with `Status`, `Severity`, `Effort`, `Service` custom fields
@@ -152,11 +159,12 @@ Milestones   (always): one per plan, with optional due date + auto-progress
 | `/gh-pms:gh-feature`      | `pms_create_feature` (sets native type)       |
 | `/gh-pms:gh-bug`          | `pms_create_bug_report` (sets native type)    |
 | `/gh-pms:gh-task`         | `pms_create_task`                             |
-| `/gh-pms:gh-current`      | `pms_set_current_feature` (project Status)    |
-| `/gh-pms:gh-advance`      | `pms_advance_feature` (project Status)        |
+| `/gh-pms:gh-current`      | `pms_set_current_feature` (auto-creates feature branch) |
+| `/gh-pms:gh-advance`      | `pms_advance_feature` (Gate 1 refuses from protected base) |
+| `/gh-pms:gh-push` ✨      | (new in v0.3) — commit + push + PR + Gate 4 + Gate 5 in one shot |
 | `/gh-pms:gh-validate`     | `pms_validate_gates`                          |
 | `/gh-pms:gh-review`       | `pms_request_review` + `pms_submit_review`    |
-| `/gh-pms:gh-relate` ✨    | (new in v0.2) — manage issue relationships    |
+| `/gh-pms:gh-relate`       | (new in v0.2) — manage issue relationships    |
 | `/gh-pms:gh-request`      | `pms_create_request`                          |
 | `/gh-pms:gh-status`       | `pms_list_features` (reads project board)     |
 
@@ -173,8 +181,9 @@ Milestones   (always): one per plan, with optional due date + auto-progress
 - **WIP limit** — One in-progress issue per assignee
 - **Gate cooldown** — 30s minimum between transitions on the same issue (prevents fake batch-advancement)
 - **Kind-specific skips** — Bugs/hotfixes/testcases skip Gate 3 (docs)
-- **PR enforcement** — Gate 4 requires an open PR with `Closes #N`
-- **User-only Gate 5** — Only `gh-review`'s Phase 2 can move to `done`, and only after `AskUserQuestion` approval
+- **Branching policy** (v0.3) — Feature work must land on a feature branch, not on `main` / `master`. `gh-current` auto-creates the branch; `gh-advance` Gate 1 refuses from the protected base; `gh-push` refuses to ship from the protected base. Bootstrap commits with no issue number are exempt.
+- **PR enforcement** — Every feature must end with a PR containing `Closes #N` so merge auto-closes the issue. Gate 4 requires it; `gh-push` injects it automatically.
+- **User-only Gate 5** — Only `gh-push` Step 5 (or `gh-review`'s Phase 2) can move to `done`, and only after `AskUserQuestion` approval
 - **Native primitives preferred** — Issue Types, Project Status field, and Milestones are used when available; labels stay as a fallback and visible-at-a-glance signal
 
 ## Configuration

@@ -108,6 +108,42 @@ guardrails:
   gate_cooldown_seconds: 30
   cooldown_violation_message: "Gates require at least 30s between transitions. Slow down — verify your evidence."
 
+# Branching policy — every feature must end with a PR linked to its issue.
+# Enforced by gh-current (auto-creates a branch on start), gh-advance (Gate 1
+# refuses if work is on the protected base branch), and gh-push (refuses to
+# push from the protected base branch).
+branching:
+  # Branch protection — work for the kinds listed here must NOT happen on the
+  # protected base. gh-current branches off automatically; gh-push refuses to
+  # ship from the base.
+  protected_base:
+    - main
+    - master
+  # Kinds that require a feature branch + PR. Bootstrapping commits without
+  # an issue number ("chore: setup CI", "docs: add LICENSE") are exempt.
+  pr_required_kinds:
+    - feature
+    - bug
+    - hotfix
+    - chore
+    - testcase
+  # Branch name template — substituted on gh-current. {kind_short} maps each
+  # kind to a short prefix (feat / fix / chore / hotfix / test). {slug} comes
+  # from the issue title (lowercased, non-alphanum → '-').
+  branch_template: "{kind_short}/{number}-{slug}"
+  kind_short:
+    feature: feat
+    bug: fix
+    hotfix: hotfix
+    chore: chore
+    testcase: test
+  # PR body must contain `Closes #N` (case-insensitive) so merge auto-closes
+  # the issue. Enforced by the pre-pr-create hook + gh-push.
+  pr_must_close_issue: true
+  # On Gate 1, refuse the transition if HEAD is on the protected base. This
+  # forces feature work onto a real branch before "ready-for-testing".
+  gate1_refuses_protected_base: true
+
 # GitHub native features — auto-detected per repo on `gh-init`
 github_features:
   # Use GitHub native Issue Types (Feature / Bug / Task) when the repo's owner

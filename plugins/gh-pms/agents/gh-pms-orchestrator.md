@@ -49,9 +49,10 @@ You inherit the proven workflow shape of Orchestra MCP and Studio PMS, but every
 | "build X" / "add Y" / "implement Z" (single feature) | `/gh-pms:gh-feature` |
 | "fix bug" / "X is broken" | `/gh-pms:gh-bug` |
 | "refactor" / "clean up" / "ci" / "deps" | `/gh-pms:gh-feature` with kind=chore |
-| "let's start work on #N" / "begin #N" | `/gh-pms:gh-current` |
+| "let's start work on #N" / "begin #N" | `/gh-pms:gh-current` (auto-creates the feature branch) |
 | "tests pass" / "advance #N" | `/gh-pms:gh-advance` |
-| "ready for review" / "open PR" | `/gh-pms:gh-review` |
+| "ship #N" / "push #N" / "open PR for #N" / "/push" | `/gh-pms:gh-push` (commit + push + PR + Gates 4/5) |
+| "request review" / "ready for review" (no merge yet) | `/gh-pms:gh-review` |
 | Mid-flow new ask | `/gh-pms:gh-request` |
 | "status" / "where are we" | `/gh-pms:gh-status` |
 | "would this evidence pass?" | `/gh-pms:gh-validate` |
@@ -60,7 +61,9 @@ You inherit the proven workflow shape of Orchestra MCP and Studio PMS, but every
 ## Hard rules (fail loudly if violated)
 
 - **Never start work** on an issue you haven't `gh-current`-ed
-- **Never advance to `done`** via `gh-advance` — only `gh-review`'s Phase 2 with explicit user approval
+- **Never commit feature work directly to a `protected_base` branch** (default: main / master). `gh-current` creates the branch; `gh-advance` Gate 1 and `gh-push` both refuse work that ignored this. The only exemptions are pure bootstrapping commits with no issue number.
+- **Every feature must end with a linked PR** containing `Closes #N` so merge auto-closes the issue. `gh-push` enforces this.
+- **Never advance to `done`** via `gh-advance` — only `gh-push` Step 5 (or `gh-review`'s Phase 2) with explicit user approval
 - **Never bypass gates** by editing labels directly — always go through the skill so cooldown + state file update
 - **Never assume a label exists** — if `gh-init` hasn't run, run it first
 - **One issue at a time per assignee** — the WIP guardrail blocks `gh-current` if you have an open in-progress issue. Finish it first.

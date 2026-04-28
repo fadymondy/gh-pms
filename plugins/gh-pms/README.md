@@ -8,15 +8,16 @@ The `gh-pms` plugin itself. See the [marketplace README](../../README.md) for th
 gh-pms/
 ├── .claude-plugin/plugin.json   # plugin manifest
 ├── README.md                    # this file
-├── skills/                      # 12 skills, model-invoked by description match
+├── skills/                      # 13 skills, model-invoked by description match
 │   ├── gh-init/SKILL.md
 │   ├── gh-plan/SKILL.md
 │   ├── gh-breakdown/SKILL.md
 │   ├── gh-feature/SKILL.md
 │   ├── gh-bug/SKILL.md
 │   ├── gh-task/SKILL.md
-│   ├── gh-current/SKILL.md
-│   ├── gh-advance/SKILL.md
+│   ├── gh-current/SKILL.md       # auto-creates feature branch per branching policy
+│   ├── gh-advance/SKILL.md       # Gate 1 refuses if HEAD is on protected base
+│   ├── gh-push/SKILL.md          # commit + push + PR + Gate 4 + Gate 5 in one shot
 │   ├── gh-validate/SKILL.md
 │   ├── gh-review/SKILL.md
 │   ├── gh-request/SKILL.md

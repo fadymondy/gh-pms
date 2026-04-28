@@ -25,7 +25,15 @@ Move an issue forward through its lifecycle, enforcing the gate.
    ${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh set-status {N} "{Target Status Name}"
    ```
    Done.
-6. **If gated**:
+6. **Branch-policy pre-check (Gate 1 only)**: per `workflows/default.yaml#branching.gate1_refuses_protected_base`, before validating Gate 1 evidence, check the current git branch. If it is in `branching.protected_base` (default: main / master) AND the issue's kind is in `branching.pr_required_kinds`, REJECT:
+   ```
+   Gate 1 BLOCKED: feature work must be on a branch, not on `{base}`.
+   Run: git checkout -b {kind_short}/{N}-{slug}
+        git cherry-pick / git reset to move your commits onto the branch.
+   Re-run /gh-pms:gh-advance #{N} from the branch.
+   ```
+   Skip this check only if the issue body or a comment contains the literal string `[gh-pms: branch-exception]` (a one-off escape hatch — should be rare).
+7. **If gated**:
    a. Check cooldown: read `~/.cache/gh-pms/state.json[issue_key].last_transition_at`. If < 30s ago, REJECT:
       ```
       Gate cooldown: last transition was {N}s ago. Wait {30-N}s and verify your evidence is real, not boilerplate.
@@ -62,8 +70,8 @@ Move an issue forward through its lifecycle, enforcing the gate.
         Evidence: {comment_url}
         Next: {next-action-hint}
         ```
-7. **For Gate 4 (documented → in-review)**: must verify a PR is open with `Closes #{N}` in body. Use `mcp__github__list_pull_requests` to find any PR mentioning the issue number.
-8. **For Gate 5 (in-review → done)**: this skill REJECTS direct calls. User must approve via `/gh-pms:gh-review`'s `submit_review` step. Return:
+8. **For Gate 4 (documented → in-review)**: must verify a PR is open with `Closes #{N}` in body. Use `mcp__github__list_pull_requests` to find any PR mentioning the issue number. If no PR exists, route the user to `/gh-pms:gh-push #{N}` which handles push + PR creation + review-request in one shot.
+9. **For Gate 5 (in-review → done)**: this skill REJECTS direct calls. User must approve via `/gh-pms:gh-review`'s `submit_review` step. Return:
    ```
    Cannot advance to status:done directly. Use /gh-pms:gh-review to request user approval, then submit the decision.
    ```
@@ -79,6 +87,8 @@ Per `workflows/default.yaml` `gates[*].skip_for_kinds`:
 - Cooldown: 30s between transitions
 - WIP limit: enforced by `gh-current` not here (advance assumes you're already current)
 - Evidence file-path check: `## Changes` and `## Checklist` must contain at least one path that exists in the repo (`-` prefix list, validate via Bash `test -f`)
+- Branch-policy check (Gate 1): refuses to advance feature work that is still on the protected base branch — see step 6 above
+- macOS bash 3.2 compatibility: `lib/validate-evidence.sh` uses bash 4+ associative arrays. On systems with only bash 3 (default on macOS), the validator errors with `declare: -A: invalid option`. Until the script is rewritten, fall back to a manual section-length + file-existence check before posting evidence; this is a known plugin issue tracked separately.
 
 ## Cross-skill contract
 

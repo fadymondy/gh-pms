@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] — 2026-04-29
+
+### Added — `gh-push` skill + branching policy
+
+- **`gh-push` skill** — Ship completed work in one command. Composes commit (with conventional prefix and `(#N)` issue reference), branch push, PR open with `Closes #N`, Gate 4 self-review evidence, `AskUserQuestion` approval gate, and `gh pr merge` (configurable style). Auto-flips status `documented → in-review → done` on approval; routes back to `in-progress` on `Needs edits`. Mirrors the popular `/push` skill but PR-aware and lifecycle-integrated. Supports `--message`, `--no-merge`, `--admin`, `--squash` / `--merge` / `--rebase`, `--dry`, `--force` flags.
+- **Branching policy** — New `branching` block in `workflows/default.yaml` enforcing the rule **every feature must end with a linked PR**. `protected_base` (default: `main` / `master`) and `pr_required_kinds` (default: feature / bug / hotfix / chore / testcase) define what cannot be committed directly to the base. `branch_template` (default: `{kind_short}/{number}-{slug}`) controls auto-generated branch names. `pr_must_close_issue: true` requires `Closes #N` in every PR body.
+
+### Changed
+
+- **`gh-current`** — Now creates the feature branch automatically when starting a `pr_required_kinds` issue from a `protected_base` checkout. Records `branch` + `base` in the per-issue state file so `gh-push` can find them later. The "🚧 Work started" comment now mentions the branch name.
+- **`gh-advance`** — Gate 1 (in-progress → ready-for-testing) refuses to advance feature work that is still on the protected base branch. The error message walks the user through `git switch -c …` rescue. Bypassable per-issue with the `[gh-pms: branch-exception]` marker for legacy state.
+- **`gh-pms-orchestrator` agent** — Skill-routing table now includes `gh-push`. Hard-rules section adds "never commit feature work directly to a `protected_base` branch" and "every feature must end with a linked PR containing `Closes #N`".
+- **Plugin manifest** — `version: 0.2.0 → 0.3.0`.
+
+### Known issues
+
+- `lib/validate-evidence.sh` uses bash 4+ associative arrays (`declare -A`); macOS ships bash 3.2.57 by default and the script errors with `declare: -A: invalid option`. Skills currently fall back to manual section-length + file-existence checks on macOS. Tracked separately for a portability rewrite.
+
 ## [0.2.0] — 2026-04-29
 
 ### Added — GitHub-native primitives

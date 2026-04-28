@@ -5,7 +5,7 @@ description: Set the active issue — moves it from `status:todo` to `status:in-
 
 # gh-current
 
-Mark an issue as the active piece of work.
+Mark an issue as the active piece of work AND create the feature branch the work will live on.
 
 ## What it does
 
@@ -18,22 +18,31 @@ Mark an issue as the active piece of work.
    WIP limit reached. You have #X already in progress.
    Finish it (run /gh-pms:gh-advance #X) or set it back to todo before starting #N.
    ```
-3. If clean: assign current user to the target issue:
+3. **Read issue** — `gh issue view {N} --json title,labels` to get title (for branch slug) and kind (for branch prefix). Kind comes from the `type:*` label or the GitHub native Issue Type.
+4. **Branching policy** — per `workflows/default.yaml#branching`:
+   a. If kind is in `pr_required_kinds` (default: feature / bug / hotfix / chore / testcase) AND the current branch is in `protected_base` (default: main / master):
+      - Compute branch name from `branch_template`. Default: `{kind_short}/{number}-{slug}` where `slug` is the issue title lowercased with non-alphanum runs collapsed to `-`, capped at 40 chars.
+      - Run `git fetch origin` then `git checkout -b {branch}` (or `git checkout {branch}` if it already exists locally) so all subsequent commits land on the feature branch.
+      - Comment on the issue: `🌿 Branch \`{branch}\` created from \`{base}@{sha7}\`.`
+   b. If the user is already on a non-protected branch, leave it alone — assume they intend to use that branch.
+   c. If the kind is exempt from PR requirement (e.g. `plan`), skip branch creation.
+5. Assign current user to the target issue:
    ```bash
    gh issue edit {N} --add-assignee @me
    ```
-4. Update status. Use the unified setter — it updates BOTH the `status:*` label AND the Project v2 Status field (if a project is attached), atomically:
+6. Update status via the unified setter (label + Project v2 Status field, atomically):
    ```bash
    ${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh set-status {N} "In Progress"
    ```
-5. Record start timestamp in `~/.cache/gh-pms/state.json` (for cooldown tracking).
-6. Comment on the issue: `🚧 Work started by @{me} at {ISO timestamp}.`
-7. Report:
+7. Record start timestamp + branch in `~/.cache/gh-pms/state.json` (for cooldown tracking and gh-push lookup).
+8. Comment on the issue: `🚧 Work started by @{me} at {ISO timestamp} on branch \`{branch}\`.`
+9. Report:
    ```
    Active: #{N} {title}
      status:todo → status:in-progress
      Assignee: @{me}
-   Next: do the work, then /gh-pms:gh-advance #{N} with Gate 1 evidence
+     Branch:   {branch}    (created from {base}@{sha7})
+   Next: do the work, then /gh-pms:gh-push #{N} to ship via PR.
    ```
 
 ## State file
@@ -44,11 +53,17 @@ Mark an issue as the active piece of work.
   "{owner}/{repo}/issues/{N}": {
     "started_at": "2026-04-29T10:15:00Z",
     "last_transition_at": "2026-04-29T10:15:00Z",
-    "current_status": "in-progress"
+    "current_status": "in-progress",
+    "branch": "feat/42-monaco-editor",
+    "base": "main"
   }
 }
 ```
 
+The `branch` and `base` fields let `gh-push` find the right branch to push and the right base to PR against without re-asking.
+
 ## Cross-skill contract
 
 The agent must call this BEFORE writing any code for the issue. If the user says "fix #42 now" without running `gh-current`, the skill is auto-invoked first.
+
+After branching, the agent must NOT switch back to the protected base while the issue is in-progress. If a `git checkout main` (or equivalent) is attempted before `gh-push`, warn the user and pause.

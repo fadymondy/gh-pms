@@ -1,51 +1,84 @@
 ---
 name: gh-bug
-description: File a bug report as a GitHub issue with `type:bug`. Auto-invoke when the user says "fix bug", "report bug", "X is broken", "Y crashes", "Z returns wrong data". Mirrors Orchestra MCP's `create_bug_report`. Bugs auto-skip Gate 3 (docs).
+description: File a bug report — sets GitHub native Issue Type "Bug" when available, falls back to `type:bug` label. Adds severity field/label, links related feature, attaches to active project. Mirrors Orchestra MCP's `create_bug_report`. Bugs auto-skip Gate 3 (docs).
 ---
 
 # gh-bug
 
-Create a bug-report issue. Bugs follow the same lifecycle as features but Gate 3 (docs) is auto-skipped per the workflow definition.
+Create a bug-report issue with whichever GitHub primitives are available.
 
 ## When to use
 
 - User reports a defect
-- Regression discovered in testing
-- A feature post-merge produces unexpected behavior
+- Regression found in testing
+- Post-merge unexpected behavior
 
 ## What it does
 
-1. Asks the user (only if not provided):
-   - `title` — what's broken (e.g. "Login redirects to 404 after 2FA")
-   - `steps_to_reproduce` — bullet list
-   - `expected` — what should happen
-   - `actual` — what actually happens
-   - `services` — affected `svc:*` labels (optional)
-   - `severity` — `critical | high | medium | low` (default `medium`)
-   - `related_feature` — original feature issue number if this is a regression (optional)
+### Step 1 — Collect inputs
 
-2. Reads template from `${CLAUDE_PLUGIN_ROOT}/templates/bug.md`
+Required:
+- `title` — what's broken
+- `steps_to_reproduce` — bullet list
+- `expected` — what should happen
+- `actual` — what happens
 
-3. Calls `mcp__github__issue_write`:
-   - `title`: `[Bug] {title}`
-   - `body`: filled template
-   - `labels`: `type:bug`, `status:todo`, `severity:{severity}`, `svc:*`
-   - `assignees`: omit unless user explicitly assigns
+Optional:
+- `services` — `svc:*` labels
+- `severity` — critical | high | medium | low (default `medium`)
+- `related_feature` — original feature issue number if regression
 
-4. If `related_feature` provided, comments on the original feature: `Regression filed: #{N}`
+### Step 2 — Detect features
 
-5. Reports issue number + URL.
+```bash
+FEATURES=$(${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh detect-features)
+USE_TYPES=$(echo "$FEATURES" | jq -r .issue_types)
+```
 
-## Severity → label color mapping
+### Step 3 — Create issue
 
-The `gh-init` skill creates these severity labels (run init first if missing):
-- `severity:critical` (#B60205)
-- `severity:high` (#D93F0B)
-- `severity:medium` (#FBCA04)
-- `severity:low` (#0E8A16)
+Use `mcp__github__issue_write`:
+- `title`: `[Bug] {title}`
+- `body`: filled `templates/bug.md`
+- `labels`: `type:bug`, `status:todo`, `severity:{severity}`, `svc:*`
+- Capture issue number `N`
 
-If they don't exist, create them on the fly via `gh label create`.
+### Step 4 — Set native issue type
+
+If `USE_TYPES=true`:
+```bash
+NODE_ID=$(${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh issue-node-id "{owner}" "{repo}" "{N}")
+TYPE_ID=$(${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh resolve-issue-type-id "{owner}" "Bug")
+${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh set-issue-type "$NODE_ID" "$TYPE_ID"
+```
+
+### Step 5 — Add to project + set fields
+
+If project exists, add to it and set:
+- `Status` → `Todo`
+- `Severity` → match input
+- `Service` → primary service
+
+### Step 6 — Link related feature
+
+If `related_feature`:
+- Comment on original feature: `Regression filed: #{N}`
+- Use `/gh-pms:gh-relate` (or `${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh issue-relate`):
+  ```bash
+  ${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh issue-relate "{N}" "Related to" "#{related_feature}"
+  ```
+
+### Step 7 — Report
+
+```
+Bug #{N} created: {title}
+  Issue Type:  Bug (or "label fallback: type:bug")
+  Severity:    {severity}
+  Related to:  #{related_feature or "—"}
+  URL:         https://github.com/{owner}/{repo}/issues/{N}
+Next: /gh-pms:gh-current #{N} to start fixing
+```
 
 ## Cross-skill contract
 
-Bug → `gh-current` → fix → `gh-advance` (Gate 1: in-progress → ready-for-testing) → tests → `gh-advance` (Gate 2: in-testing → ready-for-docs). **Gate 3 is auto-skipped for bugs**, so the next transition is `ready-for-docs → documented` directly. Then `gh-review` (Gate 4) → user approves (Gate 5).
+Bug → `gh-current` → fix → `gh-advance` Gate 1 → tests → Gate 2 → **Gate 3 auto-skipped** → `gh-review` Gate 4 → user approves → done.

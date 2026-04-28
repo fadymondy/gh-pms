@@ -10,39 +10,46 @@ Project-management dashboard for the current repo.
 ## What it does
 
 1. Determine repo from `git remote get-url origin`
-2. Run parallel `mcp__github__list_issues` calls:
-   - All open issues, grouped by `status:*` label
-   - Issues assigned to current user (`mcp__github__get_me`) with `status:in-progress`
-   - Open `type:request` issues (the deferred queue)
-3. Render a grouped table:
+2. Detect features via `${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh detect-features`
+3. **If a `gh-pms` Projects v2 board exists**, prefer reading it (single canonical view of Status, Severity, Effort, Service across the whole project):
+   ```bash
+   gh project item-list <project_number> --owner <owner> --format json
+   ```
+   Group by Project's `Status` field.
+4. **Otherwise** (no project), fall back to label-based grouping:
+   - `mcp__github__list_issues` — all open issues, grouped by `status:*` label
+   - Issues assigned to current user with `status:in-progress`
+   - Open `type:request` issues
+5. **Always** include milestone progress via `gh api repos/{owner}/{repo}/milestones?state=open` — show plans (= milestones) with their progress bars
+6. Render a grouped table:
 
 ```
-gh-pms · {owner}/{repo}
+gh-pms · {owner}/{repo}                    [Project: gh-pms (#3)] [Issue Types: ✓]
 
 Active (assigned to @{me})
-  #43 [Feature] Bridge endpoint        status:in-progress    started 2h ago
-  
-Pipeline
-  todo                : 5 issues  (#44 #45 #46 #47 #48)
-  in-progress         : 1 issue   (#43)
-  ready-for-testing   : 0
-  in-testing          : 0
-  ready-for-docs      : 0
-  in-docs             : 0
-  documented          : 0
-  in-review           : 2 issues  (#41 #42)
-  blocked             : 1 issue   (#39 — blocked by #38)
-  
-Plans
-  #20 [Plan] Migrate auth flow         3/5 sub-issues done
-  #30 [Plan] Real-time dashboards     0/4 sub-issues done
+  #43 [Feature] Bridge endpoint        Status: In Progress    Effort: M  started 2h ago
+
+Pipeline (from Project Status field)
+  Todo                : 5  (#44 #45 #46 #47 #48)
+  In Progress         : 1  (#43)
+  Ready for Testing   : 0
+  In Testing          : 0
+  Ready for Docs      : 0
+  In Docs             : 0
+  Documented          : 0
+  In Review           : 2  (#41 #42)
+  Blocked             : 1  (#39 — blocked by #38)
+
+Milestones (= Plans)
+  #M1 Migrate auth flow            ████░░░░░ 60%   3/5 closed   due 2026-06-01
+  #M2 Real-time dashboards         ░░░░░░░░░  0%   0/4 closed   no due date
 
 Requests (deferred)
   #50 [Request] Add MCP for Vercel    waiting triage
   #51 [Request] Bilingual error pages waiting triage
 
 Next actionable
-  → #44 (next feature in plan #20, no unmet deps)
+  → #44 (next feature in milestone #M1, no unmet deps)
 ```
 
 ## Notes

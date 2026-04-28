@@ -20,7 +20,11 @@ Move an issue forward through its lifecycle, enforcing the gate.
      - documented → in-review (Gate 4, requires PR)
      - in-review → done (Gate 5, requires user approval)
 4. Look up the gate for `from → to` in `workflows/default.yaml`
-5. **If free transition**: just swap labels via `gh issue edit`. Done.
+5. **If free transition**: update via the unified setter (updates Project Status field + status:* label):
+   ```bash
+   ${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh set-status {N} "{Target Status Name}"
+   ```
+   Done.
 6. **If gated**:
    a. Check cooldown: read `~/.cache/gh-pms/state.json[issue_key].last_transition_at`. If < 30s ago, REJECT:
       ```
@@ -45,7 +49,10 @@ Move an issue forward through its lifecycle, enforcing the gate.
       ```
    e. If valid:
       - Post the evidence as a comment via `mcp__github__add_issue_comment`
-      - Swap labels via `gh issue edit {N} --remove-label "status:{from}" --add-label "status:{to}"`
+      - Update via unified setter (label + Project Status field):
+        ```bash
+        ${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh set-status {N} "{Target Status Name}"
+        ```
       - Update `~/.cache/gh-pms/state.json[issue_key].last_transition_at = now()`
       - Update `current_status = to`
       - Report:

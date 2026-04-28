@@ -18,11 +18,14 @@ Mark an issue as the active piece of work.
    WIP limit reached. You have #X already in progress.
    Finish it (run /gh-pms:gh-advance #X) or set it back to todo before starting #N.
    ```
-3. If clean: assign current user to the target issue (`mcp__github__update_pull_request` — wait, that's PR. Use `gh issue edit` via Bash since GitHub MCP doesn't have a direct issue-assignee setter):
+3. If clean: assign current user to the target issue:
    ```bash
    gh issue edit {N} --add-assignee @me
    ```
-4. Update labels: remove `status:todo`, add `status:in-progress`. Use `gh issue edit {N} --remove-label "status:todo" --add-label "status:in-progress"`.
+4. Update status. Use the unified setter — it updates BOTH the `status:*` label AND the Project v2 Status field (if a project is attached), atomically:
+   ```bash
+   ${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh set-status {N} "In Progress"
+   ```
 5. Record start timestamp in `~/.cache/gh-pms/state.json` (for cooldown tracking).
 6. Comment on the issue: `🚧 Work started by @{me} at {ISO timestamp}.`
 7. Report:

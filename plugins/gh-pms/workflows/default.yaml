@@ -1,7 +1,11 @@
 # gh-pms default workflow
-# Mirrors the Orchestra MCP gate model. Statuses are GitHub labels of the form
-# `status:<name>`. Transitions are atomic label swaps. Gates are validated by
-# reading the most recent evidence comment on the issue.
+# Mirrors the Orchestra MCP gate model — but uses GitHub's NATIVE primitives
+# (issue types, projects v2, milestones, sub-issues, relationships) wherever
+# available, falling back to labels when not.
+#
+# Statuses live in a Projects v2 single-select "Status" field if a project is
+# attached; otherwise as `status:<name>` labels (legacy fallback). Transitions
+# update both, atomically.
 
 statuses:
   - name: todo
@@ -104,7 +108,79 @@ guardrails:
   gate_cooldown_seconds: 30
   cooldown_violation_message: "Gates require at least 30s between transitions. Slow down — verify your evidence."
 
-# Issue kinds (label `type:<kind>`)
+# GitHub native features — auto-detected per repo on `gh-init`
+github_features:
+  # Use GitHub native Issue Types (Feature / Bug / Task) when the repo's owner
+  # is an org that has them enabled. Falls back to `type:*` labels otherwise.
+  issue_types: auto    # auto | true | false
+
+  # Use a Projects v2 board for Status tracking (and other custom fields).
+  # When enabled, transitions update the project's "Status" field; status
+  # labels are still applied for visibility.
+  projects: auto       # auto | true | false
+
+  # Use Milestones for plans. Plans = milestones; sub-issues attach via
+  # `--milestone` flag. Milestones auto-close when all linked issues close.
+  milestones: true
+
+  # If a feature isn't available, use labels for that dimension.
+  fallback_to_labels: true
+
+  # Project name used by gh-init when creating/attaching the project.
+  project_name: "gh-pms"
+
+  # Custom fields the project should expose (created by gh-init).
+  project_fields:
+    - { name: "Status",   type: "single_select", options: ["Todo", "In Progress", "Ready for Testing", "In Testing", "Ready for Docs", "In Docs", "Documented", "In Review", "Blocked", "Done"] }
+    - { name: "Severity", type: "single_select", options: ["Critical", "High", "Medium", "Low"] }
+    - { name: "Effort",   type: "single_select", options: ["S", "M", "L", "XL"] }
+    - { name: "Service",  type: "single_select", options: ["app", "bridge", "studio", "edge", "db", "devops"] }
+
+# Mapping from gh-pms `kind` to GitHub native Issue Type name.
+# When issue_types is enabled, the plugin sets the issue type instead of
+# applying a `type:*` label.
+kind_to_issue_type:
+  feature:  "Feature"
+  bug:      "Bug"
+  hotfix:   "Bug"        # GitHub default set has no Hotfix; map to Bug + label `priority:critical`
+  chore:    "Task"
+  testcase: "Task"       # plus label `type:testcase` for filtering
+  plan:     null         # plans are milestones, not issues with type
+  prd:      null         # PRDs are documents — no issue type
+  request:  "Task"       # plus label `type:request`
+
+# Issue relationships — encoded in body sections AND via GitHub's native
+# cross-reference / sub-issue / "Tracked by" features.
+relationships:
+  - name: depends_on
+    body_section: "Depends on"
+    direction: outbound        # this issue depends on others
+    body_format: "- {target}"  # e.g. "- #42"
+    creates_native_link: false
+  - name: blocks
+    body_section: "Blocks"
+    direction: outbound
+    body_format: "- {target}"
+    creates_native_link: false
+  - name: related_to
+    body_section: "Related to"
+    direction: bidirectional
+    body_format: "- {target}"
+    creates_native_link: false
+  - name: duplicate_of
+    body_section: "Duplicate of"
+    direction: outbound
+    body_format: "{target}"
+    creates_native_link: false   # we close the issue with `not planned` reason
+    closes_self: true            # marking duplicate closes this issue
+  - name: closes               # only valid in PR bodies
+    body_section: null
+    direction: outbound
+    body_format: "Closes {target}"
+    creates_native_link: true    # native GitHub keyword auto-closes on merge
+    pr_only: true
+
+# Issue kinds (when types not available, applied as `type:<kind>` label)
 kinds:
   - name: feature
     description: New functionality or enhancement

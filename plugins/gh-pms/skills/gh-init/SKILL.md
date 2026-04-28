@@ -1,83 +1,122 @@
 ---
 name: gh-init
-description: Bootstrap a GitHub repo for gh-pms — creates the `type:*`, `status:*`, and service labels, drops in issue templates and a PR template. Run this once per repo before using gh-pms. Idempotent — safe to re-run. Auto-invoke when the user is in a repo without the gh-pms label set, or when they say "set up issues", "init pms", "bootstrap this repo".
+description: Bootstrap a GitHub repo for gh-pms — detects available native features (Issue Types, Projects v2, Milestones), provisions what's missing, drops in issue templates and a PR template. Run this once per repo before using gh-pms. Idempotent. Auto-invoke when the user is in a repo without the gh-pms project, or when they say "set up issues", "init pms", "bootstrap this repo".
 ---
 
 # gh-init
 
-Bootstrap the current repository so the rest of gh-pms can run.
+Bootstrap the current repo so the rest of gh-pms can run with full GitHub-native primitives.
 
 ## When to use
 
-- User is in a fresh repo and says "set up", "init", or "bootstrap"
-- A `gh-*` skill is about to run but the required labels don't exist
+- User is in a fresh repo and says "set up", "init", "bootstrap"
+- A `gh-*` skill reports missing infrastructure (no project, no labels, no milestones)
 - User explicitly invokes `/gh-pms:gh-init`
 
-## What it does
+## Step 1 — Verify location
 
-1. Verifies you're inside a git repo with a GitHub remote (`gh repo view --json nameWithOwner`)
-2. Creates these labels (idempotent — `gh label create --force` style):
+Run `gh repo view --json nameWithOwner -q .nameWithOwner` (via Bash). If it fails, fail with: `gh-init: not in a GitHub repo. Run from inside one.`
 
-   **Type labels:**
-   - `type:feature` (#0E8A16 green)
-   - `type:bug` (#D73A4A red)
-   - `type:hotfix` (#B60205 dark red)
-   - `type:chore` (#FBCA04 yellow)
-   - `type:plan` (#5319E7 purple)
-   - `type:prd` (#1D76DB blue)
-   - `type:testcase` (#C5DEF5 light blue)
-   - `type:request` (#BFDADC teal)
-
-   **Status labels:**
-   - `status:todo` (#FFFFFF white)
-   - `status:in-progress` (#1F883D green)
-   - `status:ready-for-testing` (#0969DA blue)
-   - `status:in-testing` (#8250DF purple)
-   - `status:ready-for-docs` (#9333EA violet)
-   - `status:in-docs` (#A371F7 lavender)
-   - `status:documented` (#3FB950 mint)
-   - `status:in-review` (#BF8700 amber)
-   - `status:blocked` (#CF222E red)
-   - `status:done` (#1A7F37 dark green)
-
-   **Generic service labels** (skip if user says "no services"):
-   - `svc:app`, `svc:bridge`, `svc:studio`, `svc:edge`, `svc:db`, `svc:devops` (all #C5DEF5)
-
-3. Copies issue templates from this plugin's `templates/` directory into `.github/ISSUE_TEMPLATE/` of the active repo:
-   - `feature.md`, `bug.md`, `chore.md`, `plan.md`, `prd.md`, `request.md`
-4. Copies the PR template into `.github/PULL_REQUEST_TEMPLATE.md`
-5. Commits the templates with message `chore: bootstrap gh-pms templates and labels`
-6. Reports a one-line summary: `gh-pms ready in <owner>/<repo> — N labels created, K templates added`
-
-## How to execute
-
-Use the `gh` CLI for batch label operations (faster than MCP one-by-one):
+## Step 2 — Detect native features
 
 ```bash
-# For each label:
-gh label create "type:feature" --color "0E8A16" --description "New functionality" --force
-# ...etc
+${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh detect-features
 ```
 
-For template files, use the **Write** tool to drop them into `.github/ISSUE_TEMPLATE/`. The template content is in this plugin's `templates/` directory — read it via Read, then write to the target repo.
+This returns JSON like:
+```json
+{
+  "issue_types": true,
+  "projects_scope": false,
+  "owner_kind": "Organization",
+  "types": [{"id": "IT_kw...", "name": "Feature", "color": "BLUE"}, ...]
+}
+```
 
-## Required inputs
+Use this to decide which primitives to provision.
 
-None — operates on the current repo (cwd). If not inside a git repo with a GitHub remote, fail with: `gh-init: not in a GitHub repo. Run from inside one.`
+## Step 3 — Provision Issue Types (if available)
 
-## Output
+If `issue_types: true` AND the org has at least Feature/Bug/Task: nothing to do — types are already at org level. Just remember the IDs for later steps.
+
+If `issue_types: false`: skip; we'll use `type:*` labels.
+
+## Step 4 — Provision Projects v2 (opt-in)
+
+If the user passed `--with-project` (or said "create a project too"):
+
+a. Check token scope: `gh auth status | grep "'project'"`. If missing, run:
+   ```
+   gh auth refresh -s project
+   ```
+   and ASK the user to complete the browser flow before continuing.
+
+b. Create or find the project:
+   ```bash
+   ${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh ensure-project "gh-pms"
+   ```
+
+c. Ensure the required fields exist (idempotent):
+   ```bash
+   PN=<project_number>
+   ${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh ensure-project-field "$PN" "Status"   "Todo" "In Progress" "Ready for Testing" "In Testing" "Ready for Docs" "In Docs" "Documented" "In Review" "Blocked" "Done"
+   ${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh ensure-project-field "$PN" "Severity" "Critical" "High" "Medium" "Low"
+   ${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh ensure-project-field "$PN" "Effort"   "S" "M" "L" "XL"
+   ${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh ensure-project-field "$PN" "Service"  "app" "bridge" "studio" "edge" "db" "devops"
+   ```
+
+If the user opts out: skip; status lives on labels only.
+
+## Step 5 — Provision labels (always)
+
+Even with native types + projects, labels are the visible-at-a-glance signal in the issue list. Always create the full label set:
+
+```bash
+${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh bootstrap-labels
+```
+
+## Step 6 — Drop in templates
+
+Copy from this plugin's `templates/` to the active repo's `.github/`:
+
+```
+.github/ISSUE_TEMPLATE/feature.md      ← templates/feature.md
+.github/ISSUE_TEMPLATE/bug.md          ← templates/bug.md
+.github/ISSUE_TEMPLATE/chore.md        ← templates/chore.md
+.github/ISSUE_TEMPLATE/plan.md         ← templates/plan.md
+.github/ISSUE_TEMPLATE/prd.md          ← templates/prd.md
+.github/ISSUE_TEMPLATE/request.md      ← templates/request.md
+.github/ISSUE_TEMPLATE/testcase.md     ← templates/testcase.md
+.github/PULL_REQUEST_TEMPLATE.md       ← templates/pull-request.md
+```
+
+If a target already exists, ASK before overwriting.
+
+## Step 7 — Commit templates
+
+```bash
+git add .github/
+git commit -m "chore: bootstrap gh-pms templates and labels"
+```
+
+Do NOT add Co-Authored-By trailers. Use the user's git config.
+
+## Step 8 — Report
 
 ```
 gh-pms ready in {owner}/{repo}
-  ✓ 18 labels created (8 type, 10 status)
-  ✓ 6 issue templates added at .github/ISSUE_TEMPLATE/
-  ✓ PR template added at .github/PULL_REQUEST_TEMPLATE.md
-  ✓ Committed: chore: bootstrap gh-pms templates and labels
-Next: use /gh-pms:gh-feature, /gh-pms:gh-bug, or /gh-pms:gh-plan
+  Native features:
+    Issue Types:  ✓ Feature / Bug / Task (org-level)         [or ✗ falling back to type:* labels]
+    Projects v2:  ✓ "gh-pms" project #{N} with 4 fields      [or ✗ skipped]
+    Milestones:   ✓ enabled
+  Labels: 26 created (8 type, 10 status, 4 severity, 4 service)
+  Templates: 7 issue templates + PR template added
+  Committed: chore: bootstrap gh-pms templates and labels
+Next: /gh-pms:gh-feature, /gh-pms:gh-bug, /gh-pms:gh-plan
 ```
 
 ## Notes
 
-- Re-running is safe. `gh label create --force` updates color/description without erroring.
-- If the repo already has files at `.github/ISSUE_TEMPLATE/<name>.md`, ASK the user before overwriting.
-- The plugin honors `${CLAUDE_PLUGIN_ROOT}` to locate its own `templates/` directory.
+- Re-running is safe end-to-end
+- `--with-project` requires `project` token scope — user must run `gh auth refresh -s project` once
+- Issue Types are an org-level setting; can't be created from the plugin. If you want them on a user repo, the only path is to move the repo to an org first.

@@ -187,16 +187,10 @@ Per-repo overrides in `.github/gh-pms.yaml` (planned for v0.3):
 - Custom severity scale
 - Map custom Issue Types beyond the GitHub default set
 
-## Inspiration
-
-- **[Orchestra MCP](https://github.com/orchestra-mcp/framework)** — the gate model, evidence sections, sub-agent constraints
-- **[Studio PMS](https://github.com/sentra-hub/studio)** — the workflow/gate/transition primitives via Supabase
-- **GitHub Sub-issues + Issue Types + Projects v2** — the native primitives this plugin leans on
-
 ## License
 
 MIT — see [LICENSE](LICENSE)
 
 ## Author
 
-[Fady Mondy](https://github.com/fadymondy) · [@ID8-Media](https://github.com/ID8-Media)
+[Fady Mondy](https://github.com/fadymondy)

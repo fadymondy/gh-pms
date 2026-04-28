@@ -1,0 +1,73 @@
+name: Feature Request
+description: Suggest a new feature or improvement for the gh-pms plugin
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for suggesting a feature. Please describe what you'd like.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What problem does this feature solve? Include the workflow you're stuck on.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe your ideal solution.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Surface
+      description: Which part of the plugin would change?
+      multiple: true
+      options:
+        - New skill
+        - Existing skill enhancement
+        - New hook
+        - Existing hook enhancement
+        - Workflow / gate definitions
+        - lib/ghcall.sh helpers
+        - lib/validate-evidence.sh
+        - Issue / PR templates
+        - Documentation / README
+        - Marketplace metadata
+    validations:
+      required: true
+
+  - type: dropdown
+    id: github-feature
+    attributes:
+      label: GitHub primitive involved
+      description: Does this depend on a specific GitHub feature?
+      multiple: true
+      options:
+        - Issue Types (org-only)
+        - Projects v2
+        - Milestones
+        - Sub-issues
+        - Issue relationships / cross-references
+        - Pull Requests
+        - Labels
+        - GraphQL API
+        - REST API
+        - None / not specific to a primitive
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Other approaches you've considered (existing skills, manual workflows, etc.).
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Mockups, sample command outputs, screenshots, or anything else.

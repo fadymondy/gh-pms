@@ -1,0 +1,10 @@
+# OS / editor cruft
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Test artifacts
+node_modules/
+dist/
+coverage/

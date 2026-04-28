@@ -1,0 +1,23 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "type": "command",
+        "command": "${CLAUDE_PLUGIN_ROOT}/hooks/user-prompt-submit.sh"
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "mcp__github__create_pull_request",
+        "type": "command",
+        "command": "${CLAUDE_PLUGIN_ROOT}/hooks/pre-pr-create.sh"
+      }
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "command": "${CLAUDE_PLUGIN_ROOT}/hooks/on-stop.sh"
+      }
+    ]
+  }
+}

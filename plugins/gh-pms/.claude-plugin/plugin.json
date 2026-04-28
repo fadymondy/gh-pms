@@ -1,0 +1,23 @@
+{
+  "$schema": "https://schemas.claude.com/claude-code/plugin.json",
+  "name": "gh-pms",
+  "description": "GitHub Issues as a project-management system — plans, features, bugs, evidence-gated lifecycle, PR-driven review. Mirrors Orchestra MCP / Studio PMS workflow but stores everything natively on GitHub.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Fady Mondy",
+    "email": "info@3x1.io",
+    "url": "https://github.com/fadymondy"
+  },
+  "homepage": "https://github.com/fadymondy/gh-pms",
+  "repository": "https://github.com/fadymondy/gh-pms",
+  "license": "MIT",
+  "keywords": [
+    "github",
+    "issues",
+    "project-management",
+    "pms",
+    "workflow",
+    "gates",
+    "orchestra"
+  ]
+}

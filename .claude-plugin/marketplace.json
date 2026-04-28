@@ -1,0 +1,17 @@
+{
+  "$schema": "https://schemas.claude.com/claude-code/marketplace.json",
+  "name": "gh-pms",
+  "description": "GitHub-Issues-as-PMS plugins. Inspired by Orchestra MCP and Studio PMS, backed by GitHub Issues primitives.",
+  "owner": {
+    "name": "Fady Mondy",
+    "email": "info@3x1.io",
+    "url": "https://github.com/fadymondy"
+  },
+  "plugins": [
+    {
+      "name": "gh-pms",
+      "source": "./plugins/gh-pms",
+      "description": "Turn GitHub Issues into a full project-management system: plans, features, bugs, gates, evidence, sub-issues, PR-driven review. Generic — works in any GitHub repo."
+    }
+  ]
+}

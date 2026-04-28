@@ -1,0 +1,132 @@
+# gh-pms default workflow
+# Mirrors the Orchestra MCP gate model. Statuses are GitHub labels of the form
+# `status:<name>`. Transitions are atomic label swaps. Gates are validated by
+# reading the most recent evidence comment on the issue.
+
+statuses:
+  - name: todo
+    description: Backlogged, not started
+  - name: in-progress
+    description: Active development
+  - name: ready-for-testing
+    description: Code complete, awaiting QA
+  - name: in-testing
+    description: Tests being run
+  - name: ready-for-docs
+    description: Tests pass, awaiting documentation
+  - name: in-docs
+    description: Documentation in progress
+  - name: documented
+    description: Docs complete, awaiting review
+  - name: in-review
+    description: PR open, awaiting user approval
+  - name: blocked
+    description: Halted by external dependency
+  - name: done
+    description: Merged + verified
+
+# Free transitions (no gate, no evidence) — always allowed
+free_transitions:
+  - [todo, in-progress]
+  - [in-progress, blocked]
+  - [blocked, in-progress]
+  - [ready-for-testing, in-testing]
+  - [ready-for-docs, in-docs]
+
+# Gated transitions — require evidence comment with structured ## Sections
+gates:
+  - id: gate1
+    from: in-progress
+    to: ready-for-testing
+    skip_for_kinds: []
+    required_sections:
+      - name: Summary
+        min_chars: 10
+      - name: Changes
+        min_chars: 10
+        require_file_paths: true
+      - name: Verification
+        min_chars: 10
+    description: "Code complete. Summary of work, list of changed files, how to verify."
+
+  - id: gate2
+    from: in-testing
+    to: ready-for-docs
+    skip_for_kinds: []
+    required_sections:
+      - name: Summary
+        min_chars: 10
+      - name: Results
+        min_chars: 10
+      - name: Coverage
+        min_chars: 10
+    description: "Tests passed. Summary, results table, coverage stats."
+
+  - id: gate3
+    from: in-docs
+    to: documented
+    skip_for_kinds: [bug, hotfix, testcase]
+    required_sections:
+      - name: Summary
+        min_chars: 10
+      - name: Location
+        min_chars: 10
+        require_file_paths: true
+    description: "Docs written. Summary, file paths to new docs."
+
+  - id: gate4
+    from: documented
+    to: in-review
+    skip_for_kinds: []
+    required_sections:
+      - name: Summary
+        min_chars: 10
+      - name: Quality
+        min_chars: 10
+      - name: Checklist
+        min_chars: 10
+        require_file_paths: true
+    description: "Self-review before user approval. Summary, quality notes, file checklist."
+    requires_pr: true
+
+  - id: gate5
+    from: in-review
+    to: done
+    skip_for_kinds: []
+    required_user_approval: true
+    description: "User approves via AskUserQuestion. PR merge auto-closes the issue."
+
+# Programmatic guardrails
+guardrails:
+  wip_limit: 1
+  wip_scope: assignee
+  wip_violation_message: "You already have an issue in status:in-progress assigned to you. Finish it before starting another."
+  gate_cooldown_seconds: 30
+  cooldown_violation_message: "Gates require at least 30s between transitions. Slow down — verify your evidence."
+
+# Issue kinds (label `type:<kind>`)
+kinds:
+  - name: feature
+    description: New functionality or enhancement
+    parent: plan
+  - name: bug
+    description: Defect report
+    parent: feature
+  - name: hotfix
+    description: Urgent fix
+    parent: feature
+  - name: chore
+    description: Maintenance / refactoring / CI work
+    parent: null
+  - name: testcase
+    description: QA test case linked to a parent feature
+    parent: feature
+  - name: plan
+    description: Multi-feature plan, broken down into sub-issues
+    parent: prd
+  - name: prd
+    description: Product requirement doc, parent of plans
+    parent: null
+  - name: request
+    description: Mid-flow user ask, deferred for triage
+    parent: null

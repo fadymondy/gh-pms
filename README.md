@@ -1,4 +1,4 @@
-# gh-pms
+# Github PMS Plugin
 
 **GitHub Issues as a project-management system for Claude Code.**
 

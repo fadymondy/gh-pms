@@ -11,9 +11,9 @@ Test evidence against a gate without performing the transition.
 
 Same evidence-validation pipeline as `gh-advance`, but stops after the validation step:
 
-1. Read issue → determine current status
+1. Read issue → determine current status + `type:*` label (kind)
 2. Determine target status (from user input or natural next)
-3. Look up gate
+3. Look up gate. **Per-kind sections**: if the gate has a `required_sections_per_kind[<kind>]` block (e.g. `bug` requires `## Summary`, `## Reproduction`, `## Root cause`, `## Fix`, `## Regression test` instead of the generic `Changes / Verification`), use that list. Per-repo overrides via `.github/gh-pms.yaml` are layered on top.
 4. Build evidence from user input (or read it from a draft comment if user says "the comment I just wrote")
 5. Run `lib/validate-evidence.sh`
 6. Report:

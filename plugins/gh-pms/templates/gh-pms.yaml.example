@@ -77,6 +77,16 @@
 #       - { name: Changes,      min_chars: 10, require_file_paths: true }
 #       - { name: Verification, min_chars: 10 }
 #       - { name: Threat model, min_chars: 30 }   # added requirement
+#     # Per-kind override — when the issue's kind matches, this list
+#     # REPLACES the base required_sections above. Default config ships
+#     # bug + hotfix with their own evidence shapes.
+#     required_sections_per_kind:
+#       bug:
+#         - { name: Summary,         min_chars: 10 }
+#         - { name: Reproduction,    min_chars: 10 }
+#         - { name: Root cause,      min_chars: 10 }
+#         - { name: Fix,             min_chars: 10, require_file_paths: true }
+#         - { name: Regression test, min_chars: 10, require_file_paths: true }
 #     description: "Code complete + threat model documented."
 
 # ─── Cross-repo plans ────────────────────────────────────────────────

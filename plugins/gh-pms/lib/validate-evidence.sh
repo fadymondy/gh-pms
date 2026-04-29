@@ -25,8 +25,24 @@ ERRORS=()
 declare -A SECTIONS
 case "$GATE_ID" in
   gate1)
-    REQUIRED="Summary Changes Verification"
-    FILES_REQUIRED_IN="Changes"
+    # Per-kind overrides — keep in sync with workflows/default.yaml
+    # `gates[*].required_sections_per_kind`. Each kind's list REPLACES the
+    # base for that kind; everything else uses the generic Summary/Changes/
+    # Verification trio.
+    case "$ISSUE_KIND" in
+      bug)
+        REQUIRED="Summary Reproduction Root_cause Fix Regression_test"
+        FILES_REQUIRED_IN="Fix Regression_test"
+        ;;
+      hotfix)
+        REQUIRED="Summary Impact Fix Verification Follow-up"
+        FILES_REQUIRED_IN="Fix"
+        ;;
+      *)
+        REQUIRED="Summary Changes Verification"
+        FILES_REQUIRED_IN="Changes"
+        ;;
+    esac
     SKIP_KINDS=""
     ;;
   gate2)

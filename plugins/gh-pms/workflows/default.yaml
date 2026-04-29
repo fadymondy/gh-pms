@@ -51,7 +51,38 @@ gates:
         require_file_paths: true
       - name: Verification
         min_chars: 10
-    description: "Code complete. Summary of work, list of changed files, how to verify."
+    # Per-kind overrides — when the issue's kind matches one of these keys,
+    # `required_sections_per_kind[<kind>]` REPLACES the base list above.
+    # Useful when a kind needs evidence the generic flow doesn't cover —
+    # e.g. bugs benefit from an explicit Reproduction + Regression test
+    # rather than generic Changes/Verification.
+    required_sections_per_kind:
+      bug:
+        - name: Summary
+          min_chars: 10
+        - name: Reproduction
+          min_chars: 10
+        - name: Root cause
+          min_chars: 10
+        - name: Fix
+          min_chars: 10
+          require_file_paths: true
+        - name: Regression test
+          min_chars: 10
+          require_file_paths: true
+      hotfix:
+        - name: Summary
+          min_chars: 10
+        - name: Impact
+          min_chars: 10
+        - name: Fix
+          min_chars: 10
+          require_file_paths: true
+        - name: Verification
+          min_chars: 10
+        - name: Follow-up
+          min_chars: 10   # what's left to clean up post-hotfix
+    description: "Code complete. Summary of work, list of changed files, how to verify. Bugs/hotfixes have kind-specific evidence — see required_sections_per_kind."
 
   - id: gate2
     from: in-testing

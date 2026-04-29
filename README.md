@@ -207,6 +207,7 @@ Milestones   (always): one per plan, with optional due date + auto-progress
 | `/gh-pms:gh-release` ✨   | (new in v0.5) — version bump + tag + release  |
 | `/gh-pms:gh-triage` ✨    | (new in v0.5) — drain the type:request inbox  |
 | `/gh-pms:gh-reopen` ✨    | (new in v0.7) — re-enter a done issue         |
+| `/gh-pms:gh-metrics` ✨   | (new in v0.7) — flow analytics + velocity     |
 
 ## Hooks
 

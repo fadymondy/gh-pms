@@ -184,11 +184,13 @@ Milestones   (always): one per plan, with optional due date + auto-progress
 | `/gh-pms:gh-relate`       | (new in v0.2) — manage issue relationships    |
 | `/gh-pms:gh-request`      | `pms_create_request`                          |
 | `/gh-pms:gh-status`       | `pms_list_features` (reads project board)     |
+| `/gh-pms:gh-context` ✨   | (new in v0.5) — session-start summary         |
 
 ## Hooks
 
 | Event                                       | Behavior                                                                  |
 | ------------------------------------------- | ------------------------------------------------------------------------- |
+| `SessionStart`                              | Injects a `gh-context` summary so the agent isn't blind on a new session  |
 | `UserPromptSubmit`                          | Classifies the prompt, injects a context reminder for the agent           |
 | `PreToolUse` on `mcp__github__create_pull_request` | Blocks PR creation if `Closes #N` is missing from the body         |
 | `Stop`                                      | Surfaces stale in-progress issues at end of turn                          |

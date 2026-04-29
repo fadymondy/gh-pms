@@ -106,6 +106,12 @@ bootstrap_labels() {
     ensure_label "severity:low"       "0E8A16" "P3 — nice to fix"
   fi
 
+  # Effort — T-shirt sizing for velocity tracking
+  ensure_label "effort:S"   "B7E1CD" "S — < 1 day"
+  ensure_label "effort:M"   "73C997" "M — 1-3 days"
+  ensure_label "effort:L"   "3FB950" "L — 3-7 days"
+  ensure_label "effort:XL"  "1A7F37" "XL — > 1 week (consider breakdown)"
+
   # Service taxonomy — also read from merged config when present
   if [[ "${SKIP_SERVICES:-0}" != "1" ]]; then
     if [[ -n "$cfg" ]]; then

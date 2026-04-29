@@ -7,6 +7,9 @@
 ## Severity
 {{severity}}
 
+## Effort
+{{effort}}
+
 ## Acceptance criteria
 - [ ] (fill in)
 - [ ] (fill in)

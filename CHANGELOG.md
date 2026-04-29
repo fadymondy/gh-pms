@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] — 2026-04-29
+
+### Added — Severity is first-class on every issue kind
+
+Severity (`critical | high | medium | low`) was bug-only in v0.3. v0.4 makes it a first-class dimension on **every** issue kind so a P0 feature blocking launch is meaningfully different from a polish item — that signal is no longer lost. Closes #2.
+
+- **Canonical scale in `workflows/default.yaml#severities`** — single source of truth (`default: medium` + four-value list with label + Project field mapping). All severity-aware skills reference this list, so per-repo severity scales become a config-only change.
+- **`gh-feature` skill** — accepts an optional `severity` input on every kind (not just hotfix). Defaults to `medium`. Applies both the `severity:*` label and (when a Project v2 board is attached) the `Severity` field. Hotfixes still default to `critical`.
+- **`gh-task` skill** — sub-issue tasks **inherit the parent feature's severity** by default; can be overridden when the task is meaningfully more or less urgent than its parent. Checkbox tasks inherit implicitly.
+- **`gh-bug` skill** — drops its private `critical | high | medium | low` definition; references the workflow file instead. Same defaults, same behavior, one source of truth.
+- **`gh-status` skill** — within each Status bucket on the dashboard, issues are sorted by severity (Critical → Low) so urgent items surface first regardless of kind. Legend added to the example output.
+- **Templates** — `feature.md`, `chore.md`, and `testcase.md` gain a `## Severity` section. `plan.md` and `prd.md` stay exempt (they aggregate child severities).
+- **`gh-pms-orchestrator` agent** — skill-routing table calls out `severity` as an optional input on the relevant skills, plus a paragraph noting severity is first-class across kinds.
+
+### Changed
+
+- **Plugin manifest** — `version: 0.3.0 → 0.4.0`.
+
+### Backwards compatibility
+
+- Existing issues without a `severity:*` label remain valid.
+- Skills called without `severity` get `medium` and are not blocked.
+- `gh-bug` consumers see no behavior change.
+- `gh-init bootstrap-labels` already creates the four severity labels; no re-bootstrapping needed.
+
 ## [0.3.0] — 2026-04-29
 
 ### Added — `gh-push` skill + branching policy

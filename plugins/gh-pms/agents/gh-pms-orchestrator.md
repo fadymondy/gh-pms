@@ -60,6 +60,7 @@ You inherit the proven workflow shape of Orchestra MCP and Studio PMS, but every
 | "metrics" / "velocity" / "how's our flow" | `/gh-pms:gh-metrics` (time-in-status + gate failure rate + throughput) |
 | "close all stale" / "bulk relabel" / "rename svc" | `/gh-pms:gh-bulk` (always confirms before applying) |
 | "show me all X" / "find issues that Y" | `/gh-pms:gh-search` (ad-hoc query, severity-sorted output) |
+| "generate test plan for #N" / "QA #N" | `/gh-pms:gh-test-plan` (testcases per acceptance criterion) |
 | "status" / "where are we" | `/gh-pms:gh-status` |
 | "what was I doing" / new session warmup | `/gh-pms:gh-context` (auto-runs via `SessionStart` hook) |
 | "ship vX.Y" / "cut a release" / "bump version" | `/gh-pms:gh-release` (changelog + plugin.json + tag + GitHub release) |

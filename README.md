@@ -217,14 +217,23 @@ Milestones   (always): one per plan, with optional due date + auto-progress
 
 ## Configuration
 
-The plugin's defaults live in [`plugins/gh-pms/workflows/default.yaml`](plugins/gh-pms/workflows/default.yaml). The `severities` block is already structured for per-repo overrides — extend or replace its `values` list and the severity-aware skills (`gh-feature`, `gh-bug`, `gh-task`, `gh-status`) pick up the new scale automatically.
+The plugin's defaults live in [`plugins/gh-pms/workflows/default.yaml`](plugins/gh-pms/workflows/default.yaml). To override per repo, drop a `.github/gh-pms.yaml` in the repo (an annotated example lives at [`plugins/gh-pms/templates/gh-pms.yaml.example`](plugins/gh-pms/templates/gh-pms.yaml.example) — `gh-init --customize` copies it for you).
 
-Per-repo overrides in `.github/gh-pms.yaml` (planned):
+The merge is shallow at the top-level key: any section you set in your override **replaces** its default counterpart wholesale. To extend a list, copy the defaults into your override and add yours.
 
-- Custom workflow definitions
-- Disable/enable specific gates
-- Custom service labels
-- Map custom Issue Types beyond the GitHub default set
+Inspect the merged result anytime:
+
+```bash
+${CLAUDE_PLUGIN_ROOT}/lib/load-config.sh 0 | jq .
+```
+
+Common overrides:
+
+- **Severity scale** — replace the `severities` block to use blocker/high/medium/nit instead of the default critical/high/medium/low
+- **Service taxonomy** — swap `github_features.project_fields[Service].options` to your team's repo set; `gh-init bootstrap-labels` creates the matching `svc:*` labels automatically
+- **Gate evidence** — add or remove required sections per gate (e.g. add a `Threat model` section to Gate 1 for security-sensitive repos)
+- **Branching policy** — change `protected_base` or `branch_template` to fit non-`main` defaults
+- **Custom kinds** — add a new issue kind beyond feature/bug/hotfix/chore/testcase/plan/prd/request
 
 ## License
 

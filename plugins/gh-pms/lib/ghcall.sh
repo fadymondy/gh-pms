@@ -79,19 +79,63 @@ bootstrap_labels() {
   ensure_label "status:blocked"            "CF222E" "Halted by external dependency"
   ensure_label "status:done"               "1A7F37" "Merged + verified"
 
-  # Severity (used by bugs)
-  ensure_label "severity:critical"  "B60205" "P0 — drop everything"
-  ensure_label "severity:high"      "D93F0B" "P1 — fix this sprint"
-  ensure_label "severity:medium"    "FBCA04" "P2 — schedule"
-  ensure_label "severity:low"       "0E8A16" "P3 — nice to fix"
+  # Severity — read from merged config when available so per-repo
+  # severity scales create the right labels. Falls back to the canonical
+  # four if load-config.sh is unavailable (yq missing, etc.).
+  local plugin_root="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
+  local loader="${plugin_root}/lib/load-config.sh"
+  local cfg=""
+  if [[ -x "$loader" ]] && cfg=$("$loader" 0 2>/dev/null) && [[ -n "$cfg" ]]; then
+    echo "$cfg" | jq -r '.severities.values[] | [.label, .description] | @tsv' \
+      | while IFS=$'\t' read -r label desc; do
+        [[ -n "$label" ]] || continue
+        # Color tier by position in the list (deterministic)
+        local color="FBCA04"
+        case "$label" in
+          *critical*|*blocker*|*p0*) color="B60205" ;;
+          *high*|*p1*)               color="D93F0B" ;;
+          *medium*|*p2*)             color="FBCA04" ;;
+          *low*|*nit*|*p3*)          color="0E8A16" ;;
+        esac
+        ensure_label "$label" "$color" "$desc"
+      done
+  else
+    ensure_label "severity:critical"  "B60205" "P0 — drop everything"
+    ensure_label "severity:high"      "D93F0B" "P1 — fix this sprint"
+    ensure_label "severity:medium"    "FBCA04" "P2 — schedule"
+    ensure_label "severity:low"       "0E8A16" "P3 — nice to fix"
+  fi
 
+  # Service taxonomy — also read from merged config when present
   if [[ "${SKIP_SERVICES:-0}" != "1" ]]; then
-    ensure_label "svc:app"      "C5DEF5" "Frontend / app code"
-    ensure_label "svc:bridge"   "C5DEF5" "Backend / API"
-    ensure_label "svc:studio"   "C5DEF5" "Studio / admin"
-    ensure_label "svc:edge"     "C5DEF5" "Edge functions"
-    ensure_label "svc:db"       "C5DEF5" "Database / migrations"
-    ensure_label "svc:devops"   "C5DEF5" "CI / deploy / infra"
+    if [[ -n "$cfg" ]]; then
+      local svc_options
+      svc_options=$(echo "$cfg" | jq -r '
+        (.github_features.project_fields // [])
+        | map(select(.name == "Service"))
+        | first.options // []
+        | .[]')
+      if [[ -n "$svc_options" ]]; then
+        while IFS= read -r svc; do
+          [[ -n "$svc" ]] || continue
+          ensure_label "svc:${svc}" "C5DEF5" "Service: ${svc}"
+        done <<< "$svc_options"
+      else
+        ensure_label "svc:app"      "C5DEF5" "Frontend / app code"
+        ensure_label "svc:bridge"   "C5DEF5" "Backend / API"
+        ensure_label "svc:studio"   "C5DEF5" "Studio / admin"
+        ensure_label "svc:edge"     "C5DEF5" "Edge functions"
+        ensure_label "svc:db"       "C5DEF5" "Database / migrations"
+        ensure_label "svc:devops"   "C5DEF5" "CI / deploy / infra"
+      fi
+    else
+      ensure_label "svc:app"      "C5DEF5" "Frontend / app code"
+      ensure_label "svc:bridge"   "C5DEF5" "Backend / API"
+      ensure_label "svc:studio"   "C5DEF5" "Studio / admin"
+      ensure_label "svc:edge"     "C5DEF5" "Edge functions"
+      ensure_label "svc:db"       "C5DEF5" "Database / migrations"
+      ensure_label "svc:devops"   "C5DEF5" "CI / deploy / infra"
+    fi
   fi
   echo "Done."
 }

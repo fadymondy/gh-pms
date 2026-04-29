@@ -216,22 +216,40 @@ jq --arg v "$NEW_VERSION" '.version = $v' "$PLUGIN_JSON" > "$tmp"
 mv "$tmp" "$PLUGIN_JSON"
 
 # 2. CHANGELOG — insert new entry after the prelude (before the first "## [")
+entry_file=$(mktemp)
+printf '%s' "$ENTRY" > "$entry_file"
 tmp=$(mktemp)
-awk -v entry="$ENTRY" '
+awk -v ef="$entry_file" '
   BEGIN { inserted = 0 }
-  /^## \[/ && !inserted { print entry; inserted = 1 }
+  /^## \[/ && !inserted {
+    while ((getline line < ef) > 0) print line
+    close(ef)
+    inserted = 1
+  }
   { print }
-  END { if (!inserted) print entry }
+  END {
+    if (!inserted) {
+      while ((getline line < ef) > 0) print line
+      close(ef)
+    }
+  }
 ' "$CHANGELOG" > "$tmp"
 mv "$tmp" "$CHANGELOG"
+rm -f "$entry_file"
 
 # 3. README — demote previous "## What's new in vX.Y" to "### From vX.Y: ..."
 #    then insert the new block above it.
+banner_file=$(mktemp)
+printf '%s' "$README_NEW_BLOCK" > "$banner_file"
 tmp=$(mktemp)
-awk -v new_block="$README_NEW_BLOCK" '
+awk -v bf="$banner_file" '
   BEGIN { demoted = 0; inserted = 0 }
   /^## What.s new in v/ && !demoted {
-    if (!inserted) { print new_block; inserted = 1 }
+    if (!inserted) {
+      while ((getline line < bf) > 0) print line
+      close(bf)
+      inserted = 1
+    }
     sub(/^## /, "### From ")
     sub(/in v/, "v")
     sub(/$/, ": (previous release)")
@@ -240,9 +258,15 @@ awk -v new_block="$README_NEW_BLOCK" '
     next
   }
   { print }
-  END { if (!inserted) print new_block }
+  END {
+    if (!inserted) {
+      while ((getline line < bf) > 0) print line
+      close(bf)
+    }
+  }
 ' "$README" > "$tmp"
 mv "$tmp" "$README"
+rm -f "$banner_file"
 
 echo "✓ plugin.json: $CURRENT → $NEW_VERSION"
 echo "✓ CHANGELOG.md: prepended v${NEW_VERSION} entry ($ISSUE_COUNT issues)"

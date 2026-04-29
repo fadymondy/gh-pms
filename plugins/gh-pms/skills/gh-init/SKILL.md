@@ -92,7 +92,23 @@ Copy from this plugin's `templates/` to the active repo's `.github/`:
 
 If a target already exists, ASK before overwriting.
 
-## Step 7 — Commit templates
+## Step 7 — (optional) Drop in a per-repo config skeleton
+
+If the user passed `--customize` (or said "I want to override severities/services/gates"):
+
+```bash
+cp "${CLAUDE_PLUGIN_ROOT}/templates/gh-pms.yaml.example" .github/gh-pms.yaml
+```
+
+The example is fully commented — every section is opt-in. Skipping `--customize` is fine for teams running with the canonical defaults; the loader gracefully falls back when no override file exists.
+
+Verify the merged result anytime:
+
+```bash
+"${CLAUDE_PLUGIN_ROOT}/lib/load-config.sh" 0 | jq .
+```
+
+## Step 8 — Commit templates
 
 ```bash
 git add .github/
@@ -101,7 +117,7 @@ git commit -m "chore: bootstrap gh-pms templates and labels"
 
 Do NOT add Co-Authored-By trailers. Use the user's git config.
 
-## Step 8 — Report
+## Step 9 — Report
 
 ```
 gh-pms ready in {owner}/{repo}
@@ -109,7 +125,8 @@ gh-pms ready in {owner}/{repo}
     Issue Types:  ✓ Feature / Bug / Task (org-level)         [or ✗ falling back to type:* labels]
     Projects v2:  ✓ "gh-pms" project #{N} with 4 fields      [or ✗ skipped]
     Milestones:   ✓ enabled
-  Labels: 26 created (8 type, 10 status, 4 severity, 4 service)
+  Labels: 28 created (8 type, 10 status, 4 severity, 6 service)   [counts reflect the merged config]
+  Per-repo config: .github/gh-pms.yaml         [or ✗ skipped]
   Templates: 7 issue templates + PR template added
   Committed: chore: bootstrap gh-pms templates and labels
 Next: /gh-pms:gh-feature, /gh-pms:gh-bug, /gh-pms:gh-plan

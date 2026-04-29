@@ -1,0 +1,89 @@
+# gh-pms · per-repo override
+#
+# This file overrides values from the plugin's default workflow
+# (plugins/gh-pms/workflows/default.yaml). Top-level keys you set here
+# REPLACE their default counterpart wholesale — there is no element-wise
+# merge for lists. To extend a list, copy the defaults into this file
+# and add your additions.
+#
+# Drop this file at .github/gh-pms.yaml in your repo. The loader picks
+# it up automatically. Run `lib/load-config.sh 0 | jq` to inspect the
+# merged result.
+#
+# Everything in this file is OPTIONAL — delete the sections you don't
+# need. The defaults already cover most teams.
+
+# ─── Severity scale ──────────────────────────────────────────────────
+# Override the default critical/high/medium/low scale. The `default`
+# value MUST appear in `values`. Each value's `label` and
+# `project_field_value` map to the GitHub label and Project v2 Severity
+# field option respectively.
+#
+# severities:
+#   default: medium
+#   values:
+#     - name: blocker
+#       label: severity:blocker
+#       project_field_value: Blocker
+#       description: P0 — production down
+#     - name: high
+#       label: severity:high
+#       project_field_value: High
+#       description: P1 — fix this sprint
+#     - name: medium
+#       label: severity:medium
+#       project_field_value: Medium
+#       description: P2 — schedule
+#     - name: nit
+#       label: severity:nit
+#       project_field_value: Low
+#       description: cosmetic / polish
+
+# ─── Service taxonomy ────────────────────────────────────────────────
+# Override the default app/bridge/studio/edge/db/devops services. Each
+# becomes an `svc:*` label on `gh-init` bootstrap. Project v2's Service
+# field options also follow this list when the loader is integrated
+# with the Projects field provisioning.
+#
+# github_features:
+#   project_fields:
+#     - { name: "Service", type: "single_select", options: ["api", "web", "ios", "android", "infra"] }
+
+# ─── Custom kinds ────────────────────────────────────────────────────
+# Add a new issue kind beyond the default set (feature/bug/hotfix/chore/
+# testcase/plan/prd/request). Each new kind needs a `kind_to_issue_type`
+# mapping (or null if it shouldn't have a native type).
+#
+# kinds:
+#   - name: experiment
+#     description: Time-boxed validation; auto-closes after 2 weeks
+#     parent: null
+#
+# kind_to_issue_type:
+#   experiment: "Task"
+
+# ─── Gate evidence overrides ─────────────────────────────────────────
+# Replace required sections per gate. Useful for security-sensitive
+# repos that want a "Threat model" section in Gate 1, or compliance
+# repos that need an "Audit trail" section in Gate 4.
+#
+# gates:
+#   - id: gate1
+#     from: in-progress
+#     to: ready-for-testing
+#     skip_for_kinds: []
+#     required_sections:
+#       - { name: Summary,      min_chars: 10 }
+#       - { name: Changes,      min_chars: 10, require_file_paths: true }
+#       - { name: Verification, min_chars: 10 }
+#       - { name: Threat model, min_chars: 30 }   # added requirement
+#     description: "Code complete + threat model documented."
+
+# ─── Branching policy overrides ──────────────────────────────────────
+# Tweak the protected base branches, kinds that require a PR, or the
+# branch naming template.
+#
+# branching:
+#   protected_base: [main, develop]
+#   pr_required_kinds: [feature, bug, hotfix, chore]
+#   branch_template: "{kind_short}/issue-{number}-{slug}"

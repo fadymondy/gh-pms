@@ -54,6 +54,12 @@ Velocity (last 7 days)
   Closed: 6 (S:3, M:2, L:1, XL:0)
   Throughput: ~1 story/day equivalent
 
+Cross-repo milestones (when the active plan is cross-repo)
+  v0.7 — Tier 2     primary: fadymondy/gh-pms#1   spans:
+    fadymondy/gh-pms-api#3        2/3 closed
+    fadymondy/gh-pms-web#5        1/2 closed
+  Aggregated:                     3/5 closed (60%)
+
 Next actionable
   → #44 (next feature in milestone #M1, no unmet deps)
 ```

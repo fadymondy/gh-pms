@@ -33,6 +33,7 @@ Decompose a plan into child issues using GitHub's native milestone + sub-issue +
 `mcp__github__issue_read` for the tracker `#42`. Pull out:
 - Title (used to find the milestone)
 - Labels (carry `svc:*` forward to children if not specified)
+- A `## Cross-repo milestones` section if present — list of `(repo, milestone-number)` pairs. When set, this plan is **cross-repo** and child routing is determined by each child's `svc:*` label.
 
 ### Step 2 — Resolve the milestone
 
@@ -53,11 +54,14 @@ USE_TYPES=$(echo "$FEATURES" | jq -r .issue_types)
 
 Substituting `{{title}}`, `{{objective}}`, `{{parent_plan}}`, `{{depends_on}}` (resolved to real numbers from previously-created children):
 
+**Cross-repo routing**: if the tracker has a `## Cross-repo milestones` section, look up the child's `svc:*` label in `.github/gh-pms.yaml` under `cross_repo.svc_to_repo` to find the target repo. Default falls back to the primary repo if no mapping. File the issue in that repo and use that repo's milestone number from the tracker's cross-repo section. The cross-repo cross-references (`tracker repo/issue` ↔ `child repo/issue`) appear automatically in both timelines because GitHub renders fully-qualified `owner/repo#N` references.
+
 a. Create issue via `mcp__github__issue_write`:
+   - `repo`: the routed target (defaults to current)
    - `title`: `[{Kind}] {title}`
    - `body`: filled `templates/{kind}.md`
    - `labels`: `type:{kind}`, `status:todo`, `svc:*`
-   - Capture new issue number
+   - Capture new issue number (and the repo it landed in)
 
 b. Set native issue type if `USE_TYPES=true` (mapping per `kind_to_issue_type` in workflows YAML)
 

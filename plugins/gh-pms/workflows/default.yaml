@@ -92,6 +92,8 @@ gates:
         require_file_paths: true
     description: "Self-review before user approval. Summary, quality notes, file checklist."
     requires_pr: true
+    requires_passing_checks: true   # refuse the transition if any required PR check is failing
+    check_override_section: "Check overrides"   # if --ignore-checks is used, the reason is recorded here
 
   - id: gate5
     from: in-review

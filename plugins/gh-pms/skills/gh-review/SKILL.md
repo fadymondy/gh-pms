@@ -29,11 +29,16 @@ Drive an issue from `documented` through `in-review` to `done`.
    - {file path 2} — {what changed}
    ```
 5. Validate via `lib/validate-evidence.sh` — must pass
-6. Post comment, swap labels `documented → in-review`
-7. Use `AskUserQuestion`:
+6. **CI gate**: run `${CLAUDE_PLUGIN_ROOT}/lib/check-pr-checks.sh <PR>`. Refuse if exit ≠ 0 unless `--ignore-checks "<reason>"` was passed (records the reason in a `## Check overrides` section of the evidence comment).
+7. **(optional) AI reviewer**: if `--ai-review <agent-name>` was passed (e.g. `code-reviewer`, `security-engineer`), spawn that sub-agent with the PR diff + the issue's body as context. Capture its review and post it as a PR review via `gh pr review`. Findings are categorized as `blockers / suggestions / nits` — only **blockers** block Gate 4. Override per-finding with `--accept <id>` or accept all suggestions with `--accept-all-suggestions`. Recommended pairings:
+   - Auth or session-handling changes → `--ai-review security-engineer`
+   - Schema migrations → `--ai-review db-architect`
+   - General feature reviews → `--ai-review code-reviewer`
+8. Post the self-review comment (plus any AI-review findings as a separate PR review comment), swap labels `documented → in-review`
+9. Use `AskUserQuestion`:
    - Question: "PR #{X} is open closing #{N}. Approve?"
    - Options: `Approve`, `Needs Edits`, `Cancel`
-8. Wait for user choice → proceed to Phase 2
+10. Wait for user choice → proceed to Phase 2
 
 ### Phase 2: submit_review (Gate 5)
 

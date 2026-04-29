@@ -94,8 +94,10 @@ else
   exit 1
 fi
 
-# Translate cutoff into an ISO date for `gh` search
-if [[ "$CUTOFF" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+# Translate cutoff into an ISO date or timestamp for `gh` search
+if [[ "$CUTOFF" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$ ]]; then
+  SINCE_DATE="$CUTOFF"
+elif [[ "$CUTOFF" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
   SINCE_DATE="$CUTOFF"
 else
   # Assume it's a git ref; pull the commit date

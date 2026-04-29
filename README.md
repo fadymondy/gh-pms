@@ -18,7 +18,16 @@ Most teams use GitHub Issues as a dumb backlog. `gh-pms` adds the structure that
 
 Everything lives natively in GitHub. Open the Issues, Milestones, or Projects tab and you see exactly where the project is.
 
-## What's new in v0.4
+## What's new in v0.5
+
+Two skills that close adoption gaps the v0.4 release made obvious — sessions starting blind to the issue tracker, and releases requiring a manual edit-bump-tag dance.
+
+- **`gh-context`** ✨ — compact session-start summary of WIP, pipeline, milestones, recent closes, deferred requests. Auto-runs via the new `SessionStart` hook so the agent picks up where the last session left off (#9).
+- **`gh-release`** ✨ — bundle PRs merged since the last tag into a structured CHANGELOG entry, bump `plugin.json`, refresh the README banner, tag, and (optionally) create a GitHub release in one shot. Idempotent; refuses without an anchor (#5).
+
+See [CHANGELOG.md](CHANGELOG.md) for the full list.
+
+### From v0.4: severity first-class
 
 Severity is now a first-class dimension on **every** issue kind, not just bugs. A P0 feature blocking a launch is meaningfully different from a polish item — that signal was previously lost. Closes #2.
 

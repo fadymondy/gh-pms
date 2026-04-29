@@ -250,8 +250,8 @@ awk -v bf="$banner_file" '
       close(bf)
       inserted = 1
     }
-    sub(/^## /, "### From ")
-    sub(/in v/, "v")
+    # "## What''s new in vX.Y" -> "### From vX.Y: (previous release)"
+    sub(/^## What.s new in /, "### From ")
     sub(/$/, ": (previous release)")
     demoted = 1
     print

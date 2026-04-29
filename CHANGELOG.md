@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] — 2026-04-29
+
+### Added
+
+- gh-release skill — bundle issues, bump version, generate changelog, tag (#5, PR #20)
+- gh-context — summarize repo history at session start (#9, PR #19)
+
 ## [0.4.0] — 2026-04-29
 
 ### Added — Severity is first-class on every issue kind

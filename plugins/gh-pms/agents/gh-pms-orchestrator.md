@@ -56,6 +56,7 @@ You inherit the proven workflow shape of Orchestra MCP and Studio PMS, but every
 | "request review" / "ready for review" (no merge yet) | `/gh-pms:gh-review` |
 | Mid-flow new ask | `/gh-pms:gh-request` |
 | "status" / "where are we" | `/gh-pms:gh-status` |
+| "what was I doing" / new session warmup | `/gh-pms:gh-context` (auto-runs via `SessionStart` hook) |
 | "would this evidence pass?" | `/gh-pms:gh-validate` |
 | Repo not bootstrapped (labels missing) | `/gh-pms:gh-init` first |
 

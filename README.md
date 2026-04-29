@@ -18,7 +18,17 @@ Most teams use GitHub Issues as a dumb backlog. `gh-pms` adds the structure that
 
 Everything lives natively in GitHub. Open the Issues, Milestones, or Projects tab and you see exactly where the project is.
 
-## What's new in v0.6
+## What's new in v0.7
+
+See [CHANGELOG.md](CHANGELOG.md#070) for the full list. Highlights:
+
+- gh-metrics skill — time-in-status, gate failure rate, throughput (#13, PR #27)
+- Optional AI reviewer on Gate 4 (sub-agent code review before user approval) (#12, PR #26)
+- Wire Effort field end-to-end (gh-feature input + gh-status velocity) (#11, PR #25)
+
+See `CHANGELOG.md` for the full v0.7.0 entry.
+
+### From v0.6: (previous release)
 
 See [CHANGELOG.md](CHANGELOG.md#060) for the full list. Highlights:
 

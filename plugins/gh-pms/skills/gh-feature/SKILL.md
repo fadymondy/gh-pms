@@ -26,7 +26,7 @@ Optional:
 - `services` — `svc:*` labels
 - `parent_feature` — required if `kind=testcase`
 - `milestone` — milestone title or number to attach to (if working under a plan)
-- `severity` — for hotfixes only
+- `severity` — `critical | high | medium | low` (default: `medium`, per `workflows/default.yaml.severities.default`). Applies to every kind — a P0 feature blocking launch is meaningfully different from a polish item. Hotfixes default to `critical`. Resolved against `workflows/default.yaml.severities.values[]` so per-repo scales work.
 
 ### Step 2 — Resolve issue type (if available)
 
@@ -50,8 +50,8 @@ Map `kind` → GitHub type via `workflows/default.yaml.kind_to_issue_type`:
 
 Use `mcp__github__issue_write`:
 - `title`: `[{Kind}] {title}`
-- `body`: filled `templates/{kind}.md`
-- `labels`: always include `type:{kind}` (even when issue type is set, for at-a-glance filtering), `status:todo`, plus `svc:*`. Add `priority:critical` for hotfix.
+- `body`: filled `templates/{kind}.md` (set `## Severity` to the resolved severity name)
+- `labels`: always include `type:{kind}` (even when issue type is set, for at-a-glance filtering), `status:todo`, `severity:{severity}`, plus `svc:*`. Add `priority:critical` for hotfix.
 - `assignees`: `[me]` if user said "I'll do this", otherwise omit
 
 Capture the new issue number `N`.
@@ -79,8 +79,9 @@ If a `gh-pms` project exists:
 ```bash
 PN=$(...)  # from gh project list
 ITEM_ID=$(${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh project-item-add "{owner}" "$PN" "https://github.com/{owner}/{repo}/issues/{N}")
-${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh project-item-set-field "{owner}" "$PN" "$ITEM_ID" "Status" "Todo"
-${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh project-item-set-field "{owner}" "$PN" "$ITEM_ID" "Service" "{primary_service}"
+${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh project-item-set-field "{owner}" "$PN" "$ITEM_ID" "Status"   "Todo"
+${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh project-item-set-field "{owner}" "$PN" "$ITEM_ID" "Severity" "{Severity}"   # title-cased project value, e.g. "Medium"
+${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh project-item-set-field "{owner}" "$PN" "$ITEM_ID" "Service"  "{primary_service}"
 ```
 
 ### Step 7 — Sub-issue link (if testcase)
@@ -96,6 +97,7 @@ mcp__github__sub_issue_write — link {N} as sub-issue of {parent_feature}
 {Kind} #{N} created: {title}
   Issue Type:  {Feature/Bug/Task or "label fallback: type:{kind}"}
   Status:      Todo (project field {if project} + status:todo label)
+  Severity:    {severity}
   Milestone:   {title or "—"}
   Labels:      {labels list}
   URL:         https://github.com/{owner}/{repo}/issues/{N}

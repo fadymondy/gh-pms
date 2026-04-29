@@ -11,6 +11,9 @@
 ## Services
 {{services}}
 
+## Severity
+{{severity}}
+
 ## Tasks
 - [ ] (added during work)
 

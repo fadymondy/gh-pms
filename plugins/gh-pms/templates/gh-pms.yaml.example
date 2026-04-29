@@ -79,6 +79,19 @@
 #       - { name: Threat model, min_chars: 30 }   # added requirement
 #     description: "Code complete + threat model documented."
 
+# ─── Cross-repo plans ────────────────────────────────────────────────
+# Map svc:* labels to the repo where issues with that service should
+# land. Used by gh-breakdown when the parent plan is cross-repo (i.e.
+# its tracker body has a `## Cross-repo milestones` section). The
+# primary repo is the fallback for any svc not listed here.
+#
+# cross_repo:
+#   svc_to_repo:
+#     svc:api:    "myorg/api"
+#     svc:web:    "myorg/web"
+#     svc:mobile: "myorg/mobile"
+#     svc:infra:  "myorg/platform"
+
 # ─── Branching policy overrides ──────────────────────────────────────
 # Tweak the protected base branches, kinds that require a PR, or the
 # branch naming template.

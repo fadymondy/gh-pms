@@ -25,10 +25,17 @@ Optional:
 - `due_date` — ISO-8601 (e.g. `2026-06-01`); empty = no due date
 - `services` — list of `svc:*` labels
 - `prd` — parent PRD issue number (if any)
+- `repos` — comma-separated `owner/repo` list to span the plan across multiple repos. The first repo is the **primary** (where the tracker issue lives); each named repo gets its own copy of the milestone. Children filed via `gh-breakdown` route into the right repo based on their `svc:*` label, mapped per-repo in `.github/gh-pms.yaml` under `cross_repo.svc_to_repo`.
 
 If missing, ask via plain text.
 
 ### Step 2 — Create the milestone
+
+For a single-repo plan, this is straightforward. For a cross-repo plan (`repos` provided):
+
+1. Create the milestone in **each** named repo with the same title + due date — milestones are repo-scoped, so coordination relies on the shared title.
+2. Record each `(repo, milestone-number)` pair on the tracker issue body under a new `## Cross-repo milestones` section so future skills can resolve them.
+3. The primary repo's milestone is the canonical anchor for the tracker issue.
 
 ```bash
 ${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh ensure-milestone "{title}" "{objective}" "{due_date_iso or empty}"

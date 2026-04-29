@@ -14,6 +14,9 @@
 ## Severity
 {{severity}}
 
+## Effort
+{{effort}}
+
 ## Tasks
 - [ ] (added during work)
 

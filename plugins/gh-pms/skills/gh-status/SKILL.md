@@ -50,6 +50,10 @@ Requests (deferred)
   #50 [Request] Add MCP for Vercel    waiting triage
   #51 [Request] Bilingual error pages waiting triage
 
+Velocity (last 7 days)
+  Closed: 6 (S:3, M:2, L:1, XL:0)
+  Throughput: ~1 story/day equivalent
+
 Next actionable
   → #44 (next feature in milestone #M1, no unmet deps)
 ```
@@ -59,3 +63,4 @@ Next actionable
 - "Started Xh ago" comes from the local state file
 - "N/M sub-issues done" comes from counting closed children of the plan via `mcp__github__list_issues` filtered by parent
 - "Blocked by #X" reads from issue body's `**Depends on**: #X` line
+- **Velocity** is computed by summing the `effort:*` labels (or Project v2 Effort field) of issues closed in the last 7 days. S/M/L/XL count as 1/3/5/8 story-points equivalent for the throughput line. Issues without an effort don't contribute (so unestimated work doesn't skew the metric)

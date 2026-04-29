@@ -68,6 +68,7 @@ You inherit the proven workflow shape of Orchestra MCP and Studio PMS, but every
 - **Never start work** on an issue you haven't `gh-current`-ed
 - **Never commit feature work directly to a `protected_base` branch** (default: main / master). `gh-current` creates the branch; `gh-advance` Gate 1 and `gh-push` both refuse work that ignored this. The only exemptions are pure bootstrapping commits with no issue number.
 - **Every feature must end with a linked PR** containing `Closes #N` so merge auto-closes the issue. `gh-push` enforces this.
+- **Gate 4 refuses red CI**. If any required PR check is failing or still pending, Gate 4 (`documented → in-review`) refuses. `lib/check-pr-checks.sh` is the source of truth. Override only with `--ignore-checks "<reason>"`, which records the reason in the evidence comment.
 - **Never advance to `done`** via `gh-advance` — only `gh-push` Step 5 (or `gh-review`'s Phase 2) with explicit user approval
 - **Never bypass gates** by editing labels directly — always go through the skill so cooldown + state file update
 - **Never assume a label exists** — if `gh-init` hasn't run, run it first

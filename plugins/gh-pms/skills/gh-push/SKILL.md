@@ -130,9 +130,10 @@ If the issue's current status is `documented`:
    - {…}
    ```
 2. Validate via `lib/validate-evidence.sh` (or a manual section-length + file-existence check on macOS bash 3 — see `gh-advance` notes).
-3. Post the comment via `gh issue comment {N} --body-file ...`.
-4. Flip status: `${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh set-status {N} "In Review"`.
-5. Update the state file (`last_transition_at`, `current_status: in-review`).
+3. **CI gate** — run `${CLAUDE_PLUGIN_ROOT}/lib/check-pr-checks.sh <PR>`. Refuse Gate 4 if exit code is non-zero (failing or still-pending checks). The script prints the failure list and the override hint. Override path: `--ignore-checks "<reason>"` skips the refusal but appends a `## Check overrides` section to the evidence comment with the reason. Use sparingly — the override is an audit trail, not a free pass.
+4. Post the comment via `gh issue comment {N} --body-file ...`.
+5. Flip status: `${CLAUDE_PLUGIN_ROOT}/lib/ghcall.sh set-status {N} "In Review"`.
+6. Update the state file (`last_transition_at`, `current_status: in-review`).
 
 If the issue is **not yet** at `documented` (e.g. user is shipping mid-flight), STOP after Step 3 and tell them:
 ```

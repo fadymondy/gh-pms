@@ -212,6 +212,7 @@ Milestones   (always): one per plan, with optional due date + auto-progress
 - **Kind-specific skips** — Bugs/hotfixes/testcases skip Gate 3 (docs)
 - **Branching policy** (v0.3) — Feature work must land on a feature branch, not on `main` / `master`. `gh-current` auto-creates the branch; `gh-advance` Gate 1 refuses from the protected base; `gh-push` refuses to ship from the protected base. Bootstrap commits with no issue number are exempt.
 - **PR enforcement** — Every feature must end with a PR containing `Closes #N` so merge auto-closes the issue. Gate 4 requires it; `gh-push` injects it automatically.
+- **CI gate on Gate 4** (v0.5+) — `documented → in-review` refuses if any required PR check is failing or still pending. `lib/check-pr-checks.sh` is the source of truth. Override only with `--ignore-checks "<reason>"`, which records the reason in a `## Check overrides` section of the evidence comment for audit.
 - **User-only Gate 5** — Only `gh-push` Step 5 (or `gh-review`'s Phase 2) can move to `done`, and only after `AskUserQuestion` approval
 - **Native primitives preferred** — Issue Types, Project Status field, and Milestones are used when available; labels stay as a fallback and visible-at-a-glance signal
 

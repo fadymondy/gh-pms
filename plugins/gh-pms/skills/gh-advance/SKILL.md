@@ -70,7 +70,13 @@ Move an issue forward through its lifecycle, enforcing the gate.
         Evidence: {comment_url}
         Next: {next-action-hint}
         ```
-8. **For Gate 4 (documented → in-review)**: must verify a PR is open with `Closes #{N}` in body. Use `mcp__github__list_pull_requests` to find any PR mentioning the issue number. If no PR exists, route the user to `/gh-pms:gh-push #{N}` which handles push + PR creation + review-request in one shot.
+8. **For Gate 4 (documented → in-review)**: must verify a PR is open with `Closes #{N}` in body. Use `mcp__github__list_pull_requests` to find any PR mentioning the issue number. If no PR exists, route the user to `/gh-pms:gh-push #{N}` which handles push + PR creation + review-request in one shot. Then run the CI check:
+   ```bash
+   ${CLAUDE_PLUGIN_ROOT}/lib/check-pr-checks.sh <PR-number>
+   ```
+   - Exit 0 → Gate 4 proceeds.
+   - Exit 1 → REFUSE the transition. The script prints which checks are failing/pending and the override hint.
+   - **Override**: if the user passes `--ignore-checks "<reason>"`, skip the refusal **but** append a `## Check overrides` section to the gate evidence comment with the reason. This is for cases like "flaky linter, will fix in follow-up #123" — the audit trail is the point. Don't let it become a habit; the cooldown won't help here.
 9. **For Gate 5 (in-review → done)**: this skill REJECTS direct calls. User must approve via `/gh-pms:gh-review`'s `submit_review` step. Return:
    ```
    Cannot advance to status:done directly. Use /gh-pms:gh-review to request user approval, then submit the decision.

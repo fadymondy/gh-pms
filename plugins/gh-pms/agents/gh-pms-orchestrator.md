@@ -58,6 +58,7 @@ You inherit the proven workflow shape of Orchestra MCP and Studio PMS, but every
 | "drain the inbox" / "triage requests" | `/gh-pms:gh-triage` (loops the type:request queue with accept/reject/defer) |
 | "reopen #N" / "X regressed" / "redo #N" | `/gh-pms:gh-reopen` (re-enters a done issue with audit trail) |
 | "metrics" / "velocity" / "how's our flow" | `/gh-pms:gh-metrics` (time-in-status + gate failure rate + throughput) |
+| "close all stale" / "bulk relabel" / "rename svc" | `/gh-pms:gh-bulk` (always confirms before applying) |
 | "status" / "where are we" | `/gh-pms:gh-status` |
 | "what was I doing" / new session warmup | `/gh-pms:gh-context` (auto-runs via `SessionStart` hook) |
 | "ship vX.Y" / "cut a release" / "bump version" | `/gh-pms:gh-release` (changelog + plugin.json + tag + GitHub release) |

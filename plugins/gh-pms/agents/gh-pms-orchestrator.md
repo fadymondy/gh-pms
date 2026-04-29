@@ -55,6 +55,7 @@ You inherit the proven workflow shape of Orchestra MCP and Studio PMS, but every
 | "ship #N" / "push #N" / "open PR for #N" / "/push" | `/gh-pms:gh-push` (commit + push + PR + Gates 4/5) |
 | "request review" / "ready for review" (no merge yet) | `/gh-pms:gh-review` |
 | Mid-flow new ask | `/gh-pms:gh-request` |
+| "drain the inbox" / "triage requests" | `/gh-pms:gh-triage` (loops the type:request queue with accept/reject/defer) |
 | "status" / "where are we" | `/gh-pms:gh-status` |
 | "what was I doing" / new session warmup | `/gh-pms:gh-context` (auto-runs via `SessionStart` hook) |
 | "ship vX.Y" / "cut a release" / "bump version" | `/gh-pms:gh-release` (changelog + plugin.json + tag + GitHub release) |

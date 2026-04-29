@@ -219,6 +219,7 @@ Milestones   (always): one per plan, with optional due date + auto-progress
 | `/gh-pms:gh-reopen` ✨    | (new in v0.7) — re-enter a done issue         |
 | `/gh-pms:gh-metrics` ✨   | (new in v0.7) — flow analytics + velocity     |
 | `/gh-pms:gh-bulk` ✨      | (new in v0.8) — safe batch ops                |
+| `/gh-pms:gh-search` ✨    | (new in v0.8) — ad-hoc issue queries          |
 
 ## Hooks
 

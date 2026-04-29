@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] — 2026-04-29
+
+### Added
+
+- gh-triage skill — accept/reject/dedupe the type:request inbox (#8, PR #23)
+- CI gate on Gate 4 — refuse review-ready when checks are red (#7, PR #22)
+- Per-repo config in .github/gh-pms.yaml (#6, PR #21)
+
 ## [0.5.0] — 2026-04-29
 
 ### Added

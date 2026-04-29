@@ -18,7 +18,17 @@ Most teams use GitHub Issues as a dumb backlog. `gh-pms` adds the structure that
 
 Everything lives natively in GitHub. Open the Issues, Milestones, or Projects tab and you see exactly where the project is.
 
-## What's new in v0.5
+## What's new in v0.6
+
+See [CHANGELOG.md](CHANGELOG.md#060) for the full list. Highlights:
+
+- gh-triage skill — accept/reject/dedupe the type:request inbox (#8, PR #23)
+- CI gate on Gate 4 — refuse review-ready when checks are red (#7, PR #22)
+- Per-repo config in .github/gh-pms.yaml (#6, PR #21)
+
+See `CHANGELOG.md` for the full v0.6.0 entry.
+
+### From v0.5: (previous release)
 
 Two skills that close adoption gaps the v0.4 release made obvious — sessions starting blind to the issue tracker, and releases requiring a manual edit-bump-tag dance.
 

@@ -100,11 +100,12 @@ if [[ "$CUTOFF" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$ ]]; 
 elif [[ "$CUTOFF" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
   SINCE_DATE="$CUTOFF"
 else
-  # Assume it's a git ref; pull the commit ISO timestamp (sub-day precision so
-  # same-day merges after the tag are picked up).
-  SINCE_DATE=$(git log -1 --format=%cI "$CUTOFF" 2>/dev/null \
-    | sed -E 's/([+-][0-9]{2}):?([0-9]{2})$/Z/' || echo "")
-  [[ -n "$SINCE_DATE" ]] || { echo "gh-release: could not resolve --since '$CUTOFF'" >&2; exit 1; }
+  # Assume it's a git ref; convert the tagged commit's timestamp to UTC ISO
+  # so same-day merges after the tag are picked up correctly.
+  SINCE_TS=$(git log -1 --format=%ct "$CUTOFF" 2>/dev/null || echo "")
+  [[ -n "$SINCE_TS" ]] || { echo "gh-release: could not resolve --since '$CUTOFF'" >&2; exit 1; }
+  SINCE_DATE=$(date -u -r "$SINCE_TS" +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null \
+    || date -u -d "@$SINCE_TS" +"%Y-%m-%dT%H:%M:%SZ")
 fi
 
 # ---------- gather merged PRs and the issues they closed --------------------

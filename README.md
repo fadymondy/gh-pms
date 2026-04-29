@@ -220,6 +220,7 @@ Milestones   (always): one per plan, with optional due date + auto-progress
 | `/gh-pms:gh-metrics` ✨   | (new in v0.7) — flow analytics + velocity     |
 | `/gh-pms:gh-bulk` ✨      | (new in v0.8) — safe batch ops                |
 | `/gh-pms:gh-search` ✨    | (new in v0.8) — ad-hoc issue queries          |
+| `/gh-pms:gh-test-plan` ✨ | (new in v0.8) — testcases from acceptance     |
 
 ## Hooks
 

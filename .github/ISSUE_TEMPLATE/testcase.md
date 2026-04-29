@@ -24,8 +24,5 @@
 ## Services
 {{services}}
 
-## Severity
-{{severity}}
-
 ---
 _Managed by gh-pms. Test cases auto-skip Gate 3 (docs)._

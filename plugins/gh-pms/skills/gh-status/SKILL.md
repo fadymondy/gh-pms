@@ -15,9 +15,10 @@ Project-management dashboard for the current repo.
    ```bash
    gh project item-list <project_number> --owner <owner> --format json
    ```
-   Group by Project's `Status` field.
+   Group by Project's `Status` field. **Within each Status bucket, sort by `Severity` (Critical → High → Medium → Low)** so the most urgent items surface first regardless of kind. Severity values come from `workflows/default.yaml.severities.values[]`.
 4. **Otherwise** (no project), fall back to label-based grouping:
    - `mcp__github__list_issues` — all open issues, grouped by `status:*` label
+   - Within each group, sort by `severity:*` label using the same Critical → Low order
    - Issues assigned to current user with `status:in-progress`
    - Open `type:request` issues
 5. **Always** include milestone progress via `gh api repos/{owner}/{repo}/milestones?state=open` — show plans (= milestones) with their progress bars
@@ -29,16 +30,17 @@ gh-pms · {owner}/{repo}                    [Project: gh-pms (#3)] [Issue Types:
 Active (assigned to @{me})
   #43 [Feature] Bridge endpoint        Status: In Progress    Effort: M  started 2h ago
 
-Pipeline (from Project Status field)
-  Todo                : 5  (#44 #45 #46 #47 #48)
-  In Progress         : 1  (#43)
+Pipeline (from Project Status field, severity-sorted)
+  Todo                : 5  (#44🔴 #45🟠 #46🟡 #47🟡 #48🟢)
+  In Progress         : 1  (#43🟠)
   Ready for Testing   : 0
   In Testing          : 0
   Ready for Docs      : 0
   In Docs             : 0
   Documented          : 0
-  In Review           : 2  (#41 #42)
-  Blocked             : 1  (#39 — blocked by #38)
+  In Review           : 2  (#41🔴 #42🟡)
+  Blocked             : 1  (#39🟠 — blocked by #38)
+  Legend: 🔴 critical · 🟠 high · 🟡 medium · 🟢 low
 
 Milestones (= Plans)
   #M1 Migrate auth flow            ████░░░░░ 60%   3/5 closed   due 2026-06-01

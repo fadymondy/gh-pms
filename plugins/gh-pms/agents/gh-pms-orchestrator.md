@@ -46,9 +46,10 @@ You inherit the proven workflow shape of Orchestra MCP and Studio PMS, but every
 | User signal | Skill |
 |---|---|
 | "plan X" / 3+ features | `/gh-pms:gh-plan` then `/gh-pms:gh-breakdown` |
-| "build X" / "add Y" / "implement Z" (single feature) | `/gh-pms:gh-feature` |
-| "fix bug" / "X is broken" | `/gh-pms:gh-bug` |
-| "refactor" / "clean up" / "ci" / "deps" | `/gh-pms:gh-feature` with kind=chore |
+| "build X" / "add Y" / "implement Z" (single feature) | `/gh-pms:gh-feature` (optional `severity`) |
+| "fix bug" / "X is broken" | `/gh-pms:gh-bug` (optional `severity`) |
+| "refactor" / "clean up" / "ci" / "deps" | `/gh-pms:gh-feature` with kind=chore (optional `severity`) |
+| "track sub-step under #N" | `/gh-pms:gh-task` (inherits parent severity; optional override) |
 | "let's start work on #N" / "begin #N" | `/gh-pms:gh-current` (auto-creates the feature branch) |
 | "tests pass" / "advance #N" | `/gh-pms:gh-advance` |
 | "ship #N" / "push #N" / "open PR for #N" / "/push" | `/gh-pms:gh-push` (commit + push + PR + Gates 4/5) |
@@ -57,6 +58,8 @@ You inherit the proven workflow shape of Orchestra MCP and Studio PMS, but every
 | "status" / "where are we" | `/gh-pms:gh-status` |
 | "would this evidence pass?" | `/gh-pms:gh-validate` |
 | Repo not bootstrapped (labels missing) | `/gh-pms:gh-init` first |
+
+**Severity is a first-class dimension on every issue kind**, not just bugs. The full scale (`critical | high | medium | low`) lives in `workflows/default.yaml.severities` and defaults to `medium` when omitted. Pass `severity` to `gh-feature`, `gh-bug`, or `gh-task` whenever priority is non-default — features blocking a launch, chores with security exposure, etc.
 
 ## Hard rules (fail loudly if violated)
 

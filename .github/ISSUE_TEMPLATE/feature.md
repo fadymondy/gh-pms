@@ -4,9 +4,6 @@
 ## Services
 {{services}}
 
-## Severity
-{{severity}}
-
 ## Acceptance criteria
 - [ ] (fill in)
 - [ ] (fill in)

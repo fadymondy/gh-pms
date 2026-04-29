@@ -100,6 +100,32 @@ gates:
     required_user_approval: true
     description: "User approves via AskUserQuestion. PR merge auto-closes the issue."
 
+# Severity scale — canonical source of truth for the `severity:*` label set
+# and the Project v2 `Severity` field. Applies to ALL issue kinds, not just
+# bugs (a P0 feature blocking launch is meaningfully different from a polish
+# item). Skills accept an optional `severity` input; default is `medium`.
+# Per-repo overrides are allowed — extend or replace the list to fit your
+# scale, but keep `default` pointing to a value present in the list.
+severities:
+  default: medium
+  values:
+    - name: critical
+      label: severity:critical
+      project_field_value: Critical
+      description: P0 — drop everything
+    - name: high
+      label: severity:high
+      project_field_value: High
+      description: P1 — fix this sprint
+    - name: medium
+      label: severity:medium
+      project_field_value: Medium
+      description: P2 — schedule
+    - name: low
+      label: severity:low
+      project_field_value: Low
+      description: P3 — nice to have
+
 # Programmatic guardrails
 guardrails:
   wip_limit: 1

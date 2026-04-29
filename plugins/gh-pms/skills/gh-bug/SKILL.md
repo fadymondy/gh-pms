@@ -25,7 +25,7 @@ Required:
 
 Optional:
 - `services` — `svc:*` labels
-- `severity` — critical | high | medium | low (default `medium`)
+- `severity` — resolved against `workflows/default.yaml.severities.values[]`. Defaults to that file's `severities.default` (`medium` out of the box). Same scale used by `gh-feature` and `gh-task` — bugs no longer own a private severity definition.
 - `related_feature` — original feature issue number if regression
 
 ### Step 2 — Detect features

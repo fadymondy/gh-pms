@@ -18,13 +18,26 @@ Most teams use GitHub Issues as a dumb backlog. `gh-pms` adds the structure that
 
 Everything lives natively in GitHub. Open the Issues, Milestones, or Projects tab and you see exactly where the project is.
 
-## What's new in v0.3
+## What's new in v0.4
 
-The "every feature must end with a linked PR" rule is now baked into the lifecycle:
+Severity is now a first-class dimension on **every** issue kind, not just bugs. A P0 feature blocking a launch is meaningfully different from a polish item — that signal was previously lost. Closes #2.
 
-- **`gh-push` skill** ✨ — One command to commit, push, open PR with `Closes #N`, post Gate 4 self-review evidence, ask the user to approve, and `gh pr merge`. Mirrors the popular `/push` pattern but PR-aware and lifecycle-integrated. Supports `--message`, `--no-merge`, `--admin`, `--squash` / `--merge` / `--rebase`, `--dry`, `--force`.
+- **Canonical scale** — `workflows/default.yaml#severities` is now the single source of truth (`default: medium` + four values, each mapped to a `severity:*` label and a Project v2 `Severity` field option). Per-repo severity scales become a config-only change.
+- **`gh-feature`** ✨ — accepts an optional `severity` on every kind (not just hotfix). Applied as label + Project field. Hotfixes still default to `critical`.
+- **`gh-task`** — sub-issue tasks inherit the parent feature's severity by default; override when the task is meaningfully more or less urgent. Checkbox tasks inherit implicitly.
+- **`gh-bug`** — references the canonical scale instead of defining its own. Same defaults, no behavior change.
+- **`gh-status`** — within each Status bucket, issues are sorted Critical → Low so urgent items surface first regardless of kind.
+- **Templates** — `feature.md`, `chore.md`, `testcase.md` gain a `## Severity` section. `plan.md` / `prd.md` stay exempt (they aggregate child severities).
+
+Backwards compatible — existing issues without a `severity:*` label remain valid, and skills called without `severity` get `medium`.
+
+### From v0.3: `gh-push` skill + branching policy
+
+The "every feature must end with a linked PR" rule is baked into the lifecycle:
+
+- **`gh-push` skill** — One command to commit, push, open PR with `Closes #N`, post Gate 4 self-review evidence, ask the user to approve, and `gh pr merge`. Mirrors the popular `/push` pattern but PR-aware and lifecycle-integrated. Supports `--message`, `--no-merge`, `--admin`, `--squash` / `--merge` / `--rebase`, `--dry`, `--force`.
 - **Branching policy** — `workflows/default.yaml#branching` defines `protected_base` (default: `main` / `master`), `pr_required_kinds` (feature / bug / hotfix / chore / testcase), `branch_template` (default: `{kind_short}/{number}-{slug}`), and `pr_must_close_issue: true`. The rule is enforced in three places: `gh-current` auto-creates the branch on start, `gh-advance` Gate 1 refuses if HEAD is on the protected base, and `gh-push` refuses to ship from the protected base.
-- **`gh-current`** now records `branch` + `base` in the per-issue state file so `gh-push` finds them later. The "🚧 Work started" comment mentions the branch name.
+- **`gh-current`** records `branch` + `base` in the per-issue state file so `gh-push` finds them later. The "🚧 Work started" comment mentions the branch name.
 - **`gh-advance`** Gate 1 has a clear rescue-recipe error if work is on the wrong branch. One-off legacy state can opt out with the `[gh-pms: branch-exception]` marker in the issue body.
 
 ### From v0.2: GitHub-native primitives
@@ -80,6 +93,10 @@ Examples:
   → /gh-pms:gh-current sets Status: In Progress
   → work happens, gates open, PR opens with Closes #N
   → user approves, PR merges, issue auto-closes
+
+"Build the launch-blocking SSO refresh — this is P0"
+  → /gh-pms:gh-feature with severity: critical
+  → severity:critical label + Severity = Critical on the project board
 
 "The login page redirects to 404 after 2FA"
   → /gh-pms:gh-bug creates issue, sets Issue Type "Bug", severity:medium
@@ -188,12 +205,13 @@ Milestones   (always): one per plan, with optional due date + auto-progress
 
 ## Configuration
 
-Per-repo overrides in `.github/gh-pms.yaml` (planned for v0.3):
+The plugin's defaults live in [`plugins/gh-pms/workflows/default.yaml`](plugins/gh-pms/workflows/default.yaml). The `severities` block is already structured for per-repo overrides — extend or replace its `values` list and the severity-aware skills (`gh-feature`, `gh-bug`, `gh-task`, `gh-status`) pick up the new scale automatically.
+
+Per-repo overrides in `.github/gh-pms.yaml` (planned):
 
 - Custom workflow definitions
 - Disable/enable specific gates
 - Custom service labels
-- Custom severity scale
 - Map custom Issue Types beyond the GitHub default set
 
 ## License

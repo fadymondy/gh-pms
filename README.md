@@ -18,7 +18,17 @@ Most teams use GitHub Issues as a dumb backlog. `gh-pms` adds the structure that
 
 Everything lives natively in GitHub. Open the Issues, Milestones, or Projects tab and you see exactly where the project is.
 
-## What's new in v0.7
+## What's new in v0.8
+
+See [CHANGELOG.md](CHANGELOG.md#080) for the full list. Highlights:
+
+- gh-test-plan skill — generate testcase sub-issues from acceptance criteria (#17, PR #31)
+- gh-search skill — ad-hoc issue queries beyond gh-status (#16, PR #30)
+- gh-bulk skill — safe batch label / close / reassign / set-severity (#15, PR #29)
+
+See `CHANGELOG.md` for the full v0.8.0 entry.
+
+### From v0.7: (previous release)
 
 See [CHANGELOG.md](CHANGELOG.md#070) for the full list. Highlights:
 

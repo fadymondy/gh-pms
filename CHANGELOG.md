@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] — 2026-04-29
+
+### Added
+
+- gh-test-plan skill — generate testcase sub-issues from acceptance criteria (#17, PR #31)
+- gh-search skill — ad-hoc issue queries beyond gh-status (#16, PR #30)
+- gh-bulk skill — safe batch label / close / reassign / set-severity (#15, PR #29)
+- Cross-repo plans — milestones spanning multiple repos (#14, PR #28)
+
+### Changed
+
+- Per-kind gate evidence sections (bug-specific Reproduction + Regression test) (#18, PR #32)
+
 ## [0.7.0] — 2026-04-29
 
 ### Added

@@ -1,4 +1,13 @@
-# Github PMS Plugin
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/brand/mark-ink.svg">
+    <img src="assets/brand/mark-paper.svg" alt="Claude Github PMS" width="128">
+  </picture>
+</p>
+
+# Claude Github PMS
+
+[Website](https://gh-pms.fadymondy.com) · [Brand](https://gh-pms.fadymondy.com/en/brand)
 
 **GitHub Issues as a project-management system for Claude Code.**
 

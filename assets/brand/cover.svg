@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640">
+  <title>Claude Github PMS</title>
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#F0EBE1" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1280" height="640" fill="#0B1429"/>
+  <rect width="1280" height="640" fill="url(#grid)"/>
+
+  <!-- Mark (unaltered lattice, scaled 3.2x) -->
+  <g transform="translate(120 160) scale(3.2)">
+    <rect x="44" y="32" width="12" height="12" fill="#C9A227"/>
+    <rect x="8" y="44" width="12" height="12" fill="#8A9A2B"/>
+    <rect x="32" y="44" width="12" height="12" fill="#8A9A2B"/>
+    <rect x="56" y="44" width="12" height="12" fill="#8A9A2B"/>
+    <rect x="80" y="44" width="12" height="12" fill="#8A9A2B"/>
+    <rect x="20" y="56" width="12" height="12" fill="#8A9A2B"/>
+    <rect x="44" y="56" width="12" height="12" fill="#8A9A2B"/>
+    <rect x="68" y="56" width="12" height="12" fill="#8A9A2B"/>
+  </g>
+
+  <g font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" fill="#F0EBE1">
+    <rect x="540" y="196" width="12" height="12" fill="#C9A227"/>
+    <text x="566" y="208" font-size="20" font-weight="600" letter-spacing="4" fill="#C9A227">CLAUDE CODE PLUGIN</text>
+    <text x="538" y="290" font-size="68" font-weight="700">Claude Github PMS</text>
+    <text x="540" y="350" font-size="28" fill-opacity="0.82">GitHub Issues as a project-management</text>
+    <text x="540" y="388" font-size="28" fill-opacity="0.82">system for Claude Code.</text>
+    <text x="540" y="452" font-size="20" fill="#8A9A2B" font-weight="600">Plans · Features · Bugs · Evidence gates · PR review</text>
+  </g>
+
+  <rect x="0" y="628" width="1280" height="12" fill="#8A9A2B"/>
+  <text x="1160" y="596" text-anchor="end" font-family="'Segoe UI', Arial, sans-serif" font-size="18" fill="#F0EBE1" fill-opacity="0.6">gh-pms.fadymondy.com</text>
+</svg>

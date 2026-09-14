@@ -1,8 +1,5 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/brand/mark-ink.svg">
-    <img src="assets/brand/mark-paper.svg" alt="Claude Github PMS" width="128">
-  </picture>
+  <a href="https://gh-pms.fadymondy.com"><img src="assets/brand/cover.png" alt="Claude Github PMS — GitHub Issues as a project-management system for Claude Code"></a>
 </p>
 
 # Claude Github PMS

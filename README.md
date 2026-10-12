@@ -4,6 +4,10 @@
 
 # Claude Github PMS
 
+<!-- Product Hunt badge: hidden until the post launches (it 404s while a draft). On launch day, remove this comment wrapper.
+<a href="https://www.producthunt.com/posts/claude-github-pms?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-claude-github-pms" target="_blank" rel="noopener"><picture><source media="(prefers-color-scheme: dark)" srcset="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1277745&theme=dark"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1277745&theme=light" alt="Claude Github PMS - Featured on Product Hunt" width="250" height="54" loading="lazy" /></picture></a>
+-->
+
 [Website](https://gh-pms.fadymondy.com) · [Brand](https://gh-pms.fadymondy.com/en/brand)
 
 **GitHub Issues as a project-management system for Claude Code.**

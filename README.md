@@ -278,6 +278,12 @@ Common overrides:
 - **Branching policy** — change `protected_base` or `branch_template` to fit non-`main` defaults
 - **Custom kinds** — add a new issue kind beyond feature/bug/hotfix/chore/testcase/plan/prd/request
 
+## Sponsor
+
+Made by the creator of **[ToGO](https://github.com/togo-framework/togo)**: the best way to support it is to **[sponsor ToGO →](https://to-go.dev/sponsor)**
+
+Or back Claude Github PMS directly on Open Collective: **[opencollective.com/claude-github-pms →](https://opencollective.com/claude-github-pms)**
+
 ## License
 
 MIT — see [LICENSE](LICENSE)

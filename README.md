@@ -4,7 +4,7 @@
 
 # Claude Github PMS
 
-[Website](https://gh-pms.fadymondy.com) · [Brand](https://gh-pms.fadymondy.com/en/brand)
+[Website](https://gh-pms.fadymondy.com) · [Brand](https://gh-pms.fadymondy.com/en/brand) · [Read the launch article](https://gh-pms.fadymondy.com/en/blog/github-issues-project-management-claude-code)
 
 **GitHub Issues as a project-management system for Claude Code.**
 
